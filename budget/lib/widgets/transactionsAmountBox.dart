@@ -1,3 +1,4 @@
+import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -26,6 +27,7 @@ class TransactionsAmountBox extends StatelessWidget {
     this.invertSign = false,
     this.getTextColor,
     this.currencyKey,
+    this.currencyTotalsStream, // AMEEN
     super.key,
   });
   final Widget? openPage;
@@ -38,6 +40,7 @@ class TransactionsAmountBox extends StatelessWidget {
   final bool invertSign;
   final String? currencyKey;
   final Function(double)? getTextColor;
+  final Stream<List<CurrencyTotal>>? currencyTotalsStream; // AMEEN
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +76,15 @@ class TransactionsAmountBox extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                     SizedBox(height: 6),
-                    DoubleTotalWithCountStreamBuilder(
+                    currencyTotalsStream != null // AMEEN
+                        ? PerCurrencyAmountBoxValue(
+                            stream: currencyTotalsStream!,
+                            textColor: textColor,
+                            absolute: absolute,
+                            invertSign: invertSign,
+                            getTextColor: getTextColor,
+                          )
+                        : DoubleTotalWithCountStreamBuilder(
                       totalWithCountStream: totalWithCountStream,
                       totalWithCountStream2: totalWithCountStream2,
                       builder: (context, snapshot) {

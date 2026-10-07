@@ -1,3 +1,4 @@
+import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/homePage/homePageNetWorth.dart';
@@ -47,6 +48,16 @@ class HomePageAllSpendingSummary extends StatelessWidget {
                         homePageStateKey.currentState?.refreshState();
                       },
                       label: "expense".tr(),
+                      currencyTotalsStream: showTotalsPerCurrency() // AMEEN
+                          ? watchTotalsPerCurrency(
+                              allWallets: Provider.of<AllWallets>(context),
+                              walletPks: walletPks,
+                              isIncome: false,
+                              followCustomPeriodCycle: true,
+                              cycleSettingsExtension: "AllSpendingSummary",
+                              onlyIncomeAndExpense: true,
+                            )
+                          : null,
                       totalWithCountStream:
                           database.watchTotalWithCountOfWallet(
                         isIncome: false,
@@ -76,6 +87,16 @@ class HomePageAllSpendingSummary extends StatelessWidget {
                         homePageStateKey.currentState?.refreshState();
                       },
                       label: "income".tr(),
+                      currencyTotalsStream: showTotalsPerCurrency() // AMEEN
+                          ? watchTotalsPerCurrency(
+                              allWallets: Provider.of<AllWallets>(context),
+                              walletPks: walletPks,
+                              isIncome: true,
+                              followCustomPeriodCycle: true,
+                              cycleSettingsExtension: "AllSpendingSummary",
+                              onlyIncomeAndExpense: true,
+                            )
+                          : null,
                       totalWithCountStream:
                           database.watchTotalWithCountOfWallet(
                         isIncome: true,

@@ -46,3 +46,10 @@ if upstream changed the translation files.
 | Account icons | `lib/pages/addWalletPage.dart` | icon picker next to the name, saves `Wallets.iconName` (`lib/ameen/walletIcon.dart`) |
 | Account icons | `lib/widgets/walletEntry.dart`, `lib/pages/editWalletsPage.dart` | show the account icon |
 | Account icons | `lib/widgets/selectAmount.dart`, `lib/pages/transactionFilters.dart` | `getAvatar` on account chips |
+| Per-currency totals | `lib/database/tables.dart` | `watchTotalWithCountOfWallet(convertToPrimary:)` optional param (default unchanged) |
+| Per-currency totals | `lib/widgets/transactionsAmountBox.dart` | optional `currencyTotalsStream` (`lib/ameen/perCurrency.dart`) |
+| Per-currency totals | `lib/pages/homePage/homePageNetWorth.dart`, `homePageAllSpendingSummary.dart` | pass `currencyTotalsStream` when the setting is on |
+| Per-currency totals | `lib/widgets/util/checkWidgetLaunch.dart` | home screen widget text per currency, AED shown as text |
+| Per-currency totals / groups | `lib/struct/defaultPreferences.dart` | `ameen*` setting defaults |
+| Groups | `lib/pages/editWalletsPage.dart` | group/total headers around rows, group follows drag, settings entries |
+| Groups | `lib/pages/addWalletPage.dart` | group chips, saved after the account (`lib/ameen/walletGroups.dart`) |

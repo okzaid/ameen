@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -60,6 +61,9 @@ class _AddWalletPageState extends State<AddWalletPage> {
   late Color? selectedColor =
       widget.wallet?.colour == null ? null : HexColor(widget.wallet?.colour);
   String? selectedIconName;
+  late String? selectedGroupPk = widget.wallet == null // AMEEN
+      ? null
+      : walletGroupPkOf(widget.wallet!.walletPk);
   Map<String, dynamic> currencies = {};
   bool customCurrencyIcon = false;
   String? searchCurrency = "";
@@ -104,6 +108,10 @@ class _AddWalletPageState extends State<AddWalletPage> {
             walletJustAdded, DateTime.now(), "");
       }
     }
+    await saveWalletGroupAfterWalletSaved( // AMEEN
+        existingWalletPk: widget.wallet?.walletPk,
+        insertedRowId: rowId,
+        groupPk: selectedGroupPk);
 
     if (popContext) {
       savingHapticFeedback();
@@ -489,6 +497,21 @@ class _AddWalletPageState extends State<AddWalletPage> {
           ),
           SliverToBoxAdapter(
             child: SizedBox(height: 15),
+          ),
+          SliverToBoxAdapter(
+            // AMEEN: account group
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 15),
+              child: WalletGroupSelector(
+                selectedGroupPk: selectedGroupPk,
+                onSelected: (groupPk) {
+                  setState(() {
+                    selectedGroupPk = groupPk;
+                  });
+                  determineBottomButton();
+                },
+              ),
+            ),
           ),
           SliverToBoxAdapter(
             child: widget.wallet == null ||

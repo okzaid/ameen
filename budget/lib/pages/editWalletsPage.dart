@@ -1,3 +1,5 @@
+import 'package:budget/ameen/walletGroups.dart';
+import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
@@ -237,7 +239,13 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                                 Theme.of(context).colorScheme.primary),
                         amountLight: 0.55,
                         amountDark: 0.35);
-                    return EditRowEntry(
+                    // AMEEN: group headers and totals above the account rows
+                    return WalletGroupSectionHeader(
+                      key: ValueKey(wallet.walletPk),
+                      walletsWithDetails: snapshot.data!,
+                      index: index,
+                      enabled: searchValue == "",
+                      child: EditRowEntry(
                       extraIcon: Provider.of<SelectedWalletPk>(context)
                                   .selectedWalletPk ==
                               wallet.walletPk
@@ -349,6 +357,7 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                           wallet: wallet,
                           routesToPopAfterDelete: RoutesToPopAfterDelete.One),
                       key: ValueKey(wallet.walletPk),
+                    ),
                     );
                   },
                   itemCount: snapshot.data!.length,
@@ -364,6 +373,10 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                       await database.moveWallet(
                           oldWallet.walletPk, _intNew, oldWallet.order);
                     }
+                    await assignWalletGroupAfterReorder( // AMEEN
+                        snapshot.data!.map((w) => w.wallet).toList(),
+                        _intPrevious,
+                        _intNew);
                     return true;
                   },
                 );
@@ -749,6 +762,8 @@ class WalletsSettings extends StatelessWidget {
       children: [
         ShowAccountLabelSettingToggle(),
         ShowCurrencyLabelSettingToggle(),
+        PerCurrencyTotalsSettingToggle(), // AMEEN
+        WalletGroupsSettingsEntry(backgroundColor: backgroundColor), // AMEEN
         ExchangeRateSettingPage(backgroundColor: backgroundColor),
       ],
     );

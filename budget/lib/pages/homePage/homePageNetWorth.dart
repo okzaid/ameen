@@ -1,3 +1,4 @@
+import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -77,6 +78,14 @@ class HomePageNetWorth extends StatelessWidget {
                         currencyKey: Provider.of<AllWallets>(context)
                             .indexedByPk[appStateSettings["selectedWalletPk"]]
                             ?.currency,
+                        currencyTotalsStream: showTotalsPerCurrency() // AMEEN
+                            ? watchTotalsPerCurrency(
+                                allWallets: Provider.of<AllWallets>(context),
+                                walletPks: walletPks,
+                                followCustomPeriodCycle: true,
+                                cycleSettingsExtension: "NetWorth",
+                              )
+                            : null,
                         totalWithCountStream:
                             database.watchTotalWithCountOfWallet(
                           isIncome: null,

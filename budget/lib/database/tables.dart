@@ -6719,6 +6719,7 @@ class FinanceDatabase extends _$FinanceDatabase {
     bool includeBalanceCorrection = false,
     bool onlyIncomeAndExpense = false, //Remove loan and balance corrections
     bool useAbsoluteSum = false,
+    bool convertToPrimary = true, // AMEEN: false for per-currency totals
   }) {
     // we have to convert currencies to account for all wallets
     List<Stream<TotalWithCount?>> mergedStreams = [];
@@ -6757,7 +6758,9 @@ class FinanceDatabase extends _$FinanceDatabase {
       mergedStreams.add(query
           .map((row) => TotalWithCount(
               total: (row.read(totalAmt) ?? 0) *
-                  (amountRatioToPrimaryCurrency(allWallets, wallet.currency)),
+                  (convertToPrimary // AMEEN
+                      ? amountRatioToPrimaryCurrency(allWallets, wallet.currency)
+                      : 1),
               count: row.read(totalCount) ?? 0))
           .watchSingle());
     }

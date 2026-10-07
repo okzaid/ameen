@@ -1,3 +1,4 @@
+import 'package:budget/ameen/perCurrency.dart';
 import 'dart:async';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
@@ -204,6 +205,10 @@ class RenderHomePageWidgetsState extends State<RenderHomePageWidgets> {
                   Provider.of<AllWallets>(context, listen: false),
                   totalSpent,
                 );
+                netWorthAmount = await homeWidgetNetWorthText( // AMEEN
+                    Provider.of<AllWallets>(context, listen: false),
+                    walletPks,
+                    netWorthAmount);
                 await HomeWidget.saveWidgetData<String>(
                   'netWorthAmount',
                   netWorthAmount,

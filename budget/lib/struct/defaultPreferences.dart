@@ -168,6 +168,10 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "pieChartAllWallets": true,
     "netWorthAllWallets": true,
     "walletsListCurrencyBreakdown": false,
+    // AMEEN
+    "ameenPerCurrencyTotals": true,
+    "ameenWalletGroups": [], // [{"pk", "name", "iconName"}] in display order
+    "ameenWalletGroupOf": {}, // {walletPk: groupPk}
     "allSpendingSummaryAllWallets": true,
     "showPastSpendingTrajectory": false,
     "lastSynced": null,

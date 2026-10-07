@@ -6,6 +6,22 @@
     "based-on-app": "Based on {upstream}",
     "based-on-app-description": "{app} is built on {upstream}, the open-source budgeting app by {author}, licensed under GPL-3.0. Tap to see the original credits, translators and acknowledgements.",
     "material-icons": "Icons",
-    "illustrated-icons": "Illustrations"
+    "illustrated-icons": "Illustrations",
+    "primary-currency": "Base Currency",
+    "select-primary-currency": "Select Base Currency",
+    "totals-per-currency": "Totals per Currency",
+    "totals-per-currency-description": "Show balances in each currency separately instead of converting them to your base currency",
+    "rename": "Rename",
+    "no-accounts": "No accounts",
+    "other-accounts": "Other Accounts",
+    "account-group": "Group",
+    "account-groups": "Account Groups",
+    "account-groups-description": "Organize accounts into groups with their own totals",
+    "add-account-group": "Add Group",
+    "rename-account-group": "Rename Group",
+    "account-group-name-placeholder": "Group name, e.g. Banks",
+    "delete-account-group-question": "Delete group?",
+    "delete-account-group-description": "Accounts in this group will not be deleted, they will move to Other Accounts.",
+    "no-account-groups": "No groups yet. Add one to organize your accounts, like Banks, Cash or Cards."
   }
 }
