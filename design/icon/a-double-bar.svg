@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- A whose crossbar is doubled like the Dirham sign: balanced books -->
+  <path d="M62 214 L128 48 L194 214" fill="none" stroke="#000" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 134 H220 M36 176 H220" fill="none" stroke="#000" stroke-width="22" stroke-linecap="round"/>
+</svg>

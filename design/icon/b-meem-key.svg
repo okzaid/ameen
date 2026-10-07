@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Arabic meem (the loop of أمين) drawn as a key lying flat: safekeeping -->
+  <path fill="#000" fill-rule="evenodd" d="M86 70a58 58 0 1 1 0 116a58 58 0 1 1 0-116zm0 32a26 26 0 1 0 0 52a26 26 0 1 0 0-52z"/>
+  <path d="M140 128 H214 M196 128 V166" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

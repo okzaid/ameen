@@ -4,7 +4,7 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#5f85c2",
+    "theme_color": "#0F5C4D",
     "description": "A budget and financial tracking application designed for you",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,

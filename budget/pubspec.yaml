@@ -113,7 +113,7 @@ flutter_icons:
     generate: true
     image_path: "assets/icon/icon-web.png"
     background_color: "#ffffff"
-    theme_color: "#5f85c2"
+    theme_color: "#0F5C4D"
 
 dev_dependencies:
   drift_dev: ^2.14.0

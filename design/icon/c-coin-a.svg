@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- single storey a: the bowl is a full coin, the stem closes the ledger -->
+  <path fill="#000" fill-rule="evenodd" d="M114 64a74 74 0 1 1 0 148a74 74 0 1 1 0-148zm0 34a40 40 0 1 0 0 80a40 40 0 1 0 0-80z"/>
+  <rect x="172" y="64" width="34" height="148" rx="17" fill="#000"/>
+</svg>
