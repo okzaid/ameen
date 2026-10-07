@@ -1,3 +1,4 @@
+import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/util/contextMenu.dart';
@@ -64,7 +65,7 @@ class TextFont extends StatelessWidget {
 
     final TextStyle textStyle = TextStyle(
       letterSpacing: letterSpacing,
-      fontWeight: this.fontWeight,
+      fontWeight: ameenFontWeight(this.fontWeight), // AMEEN
       fontSize: this.fontSize,
       fontFamily: fallbackFontLocales.contains(appStateSettings["locale"]) &&
               appStateSettings["font"] == "Avenir"
@@ -179,7 +180,7 @@ List<TextSpan> generateSpans({
       spans.add(TextSpan(
         text: boldedText,
         style: textStyle.copyWith(
-          fontWeight: FontWeight.bold,
+          fontWeight: ameenFontWeight(FontWeight.bold), // AMEEN
         ),
       ));
     }

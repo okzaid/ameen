@@ -22,6 +22,10 @@
     "account-group-name-placeholder": "Group name, e.g. Banks",
     "delete-account-group-question": "Delete group?",
     "delete-account-group-description": "Accounts in this group will not be deleted, they will move to Other Accounts.",
-    "no-account-groups": "No groups yet. Add one to organize your accounts, like Banks, Cash or Cards."
+    "no-account-groups": "No groups yet. Add one to organize your accounts, like Banks, Cash or Cards.",
+    "text-weight": "Text Weight",
+    "text-weight-regular": "Regular",
+    "text-weight-light": "Light",
+    "text-weight-lighter": "Lighter"
   }
 }

@@ -170,12 +170,13 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "walletsListCurrencyBreakdown": false,
     // AMEEN
     "ameenPerCurrencyTotals": true,
+    "ameenTextWeight": "light",
     "ameenWalletGroups": [], // [{"pk", "name", "iconName"}] in display order
     "ameenWalletGroupOf": {}, // {walletPk: groupPk}
     "allSpendingSummaryAllWallets": true,
     "showPastSpendingTrajectory": false,
     "lastSynced": null,
-    "font": "Avenir",
+    "font": "Metropolis", // AMEEN: upstream default is Avenir
     "forceSmallHeader": false,
     "animationSpeed": 1.0,
     "logging": false,

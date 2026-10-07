@@ -1,3 +1,4 @@
+import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/ameen/aboutUsPage.dart';
 import 'package:budget/ameen/brand.dart';
 import 'package:budget/colors.dart';
@@ -697,6 +698,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         HeaderHeightSetting(),
         OutlinedIconsSetting(),
         FontPickerSetting(),
+        TextWeightSetting(), // AMEEN
         AppAnimationSetting(),
         CountingNumberAnimationSetting(),
         IncreaseTextContrastSetting(),

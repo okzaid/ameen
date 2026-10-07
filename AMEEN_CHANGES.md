@@ -58,3 +58,6 @@ if upstream changed the translation files.
 Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/workflows/upstream-sync.yml` (weekly upstream merge PR).
 | Icon | `android/.../res/mipmap-*`, `drawable/notification_icon_android2.png`, `ios/.../AppIcon.appiconset`, `web/icons`, `web/favicon.*`, `assets/icon/*` | Ameen icon (sources in `design/icon/`, colour `#0F5C4D`); `web/manifest.json` + `pubspec.yaml` theme colour |
 | Build | `android/app/build.gradle` | release falls back to debug signing without key.properties |
+| Text weight | `lib/widgets/textWidgets.dart` | `ameenFontWeight()` around TextFont weights (`lib/ameen/textWeight.dart`) |
+| Text weight | `lib/pages/settingsPage.dart` | `TextWeightSetting()` under the font picker |
+| Text weight | `lib/struct/defaultPreferences.dart`, `pubspec.yaml` | default font Metropolis, `ameenTextWeight: light`; Metropolis Light/Medium/SemiBold assets |
