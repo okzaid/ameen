@@ -1,0 +1,27 @@
+# AMEEN: analyze and test every pull request and push to main
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  FLUTTER_VERSION: "3.19.6"
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: budget
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Analyze (errors only, upstream has existing warnings)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: flutter test
