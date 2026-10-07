@@ -1,0 +1,36 @@
+# AMEEN: builds an installable test APK (signed with the debug key) for
+# `adb install`. Download it from the run's "Artifacts" section.
+name: Android test APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ameen-dev]
+
+env:
+  FLUTTER_VERSION: "3.19.6"
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: budget
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Build APKs (one per CPU, smaller downloads)
+        run: flutter build apk --release --split-per-abi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ameen-apk-${{ github.sha }}
+          path: budget/build/app/outputs/flutter-apk/*.apk
+          retention-days: 14

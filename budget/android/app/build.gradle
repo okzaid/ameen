@@ -78,7 +78,8 @@ android {
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // AMEEN: without key.properties (e.g. CI test builds) sign with the debug key
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
         }
     }
 }
