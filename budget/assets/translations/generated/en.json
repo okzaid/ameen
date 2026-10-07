@@ -1180,5 +1180,10 @@
   "import-warning": "Import Warning",
   "import-warning-description": "Import may fail! Please make sure you have selected a valid Ameen [.sqlite] or [.sql] backup file",
   "duplicate-budget-question": "Duplicate Budget?",
-  "duplicate-budget": "Duplicate Budget"
+  "duplicate-budget": "Duplicate Budget",
+  "about-us": "About Us",
+  "website": "Website",
+  "terms-of-use": "Terms of Use",
+  "based-on-app": "Based on {upstream}",
+  "based-on-app-description": "{app} is built on {upstream}, the open-source budgeting app by {author}, licensed under GPL-3.0. Tap to see the original credits, translators and acknowledgements."
 }

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/aboutUsPage.dart';
 import 'package:budget/ameen/brand.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart' hide AppSettings;
@@ -193,8 +194,8 @@ class MorePages extends StatelessWidget {
               // ),
               Expanded(
                 child: SettingsContainerOpenPage(
-                  openPage: AboutPage(),
-                  title: "about-app".tr(namedArgs: {"app": globalAppName}),
+                  openPage: AboutUsPage(), // AMEEN
+                  title: "about-us".tr(), // AMEEN
                   icon: navBarIconsData["about"]!.iconData,
                   isOutlined: true,
                 ),

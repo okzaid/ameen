@@ -1,3 +1,4 @@
+import 'package:budget/ameen/aboutUsPage.dart';
 import 'package:animations/animations.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/initializeDefaultDatabase.dart';
@@ -370,7 +371,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
     EditBudgetPage(), //10
     EditCategoriesPage(), //11
     EditAssociatedTitlesPage(), //12
-    AboutPage(), //13
+    AboutUsPage(), //13 // AMEEN
     ObjectivesListPage(key: objectivesListPageStateKey, backButton: false), //14
     EditObjectivesPage(objectiveType: ObjectiveType.goal), //15
     UpcomingOverdueTransactions(
