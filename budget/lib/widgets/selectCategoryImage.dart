@@ -1,3 +1,5 @@
+import 'package:budget/ameen/materialIconCatalog.dart';
+import 'package:budget/ameen/materialIconPicker.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/struct/settings.dart';
@@ -52,6 +54,7 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
   String? selectedImage;
   String searchTerm = "";
   bool isEmoji = false;
+  late IconSource iconSource = initialIconSource(widget.selectedImage); // AMEEN
 
   @override
   void initState() {
@@ -153,7 +156,32 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                   ],
                 )
               : SizedBox.shrink(),
+          IconSourceSelector( // AMEEN
+            selected: iconSource,
+            onChanged: (source) => setState(() => iconSource = source),
+          ),
           SizedBox(height: 5),
+          if (iconSource == IconSource.material) // AMEEN
+            MaterialIconGrid(
+              searchTerm: searchTerm,
+              selectedImage: selectedImage,
+              onSelected: (icon) {
+                String iconName = materialIconNameToStore(icon.name);
+                widget.setSelectedImage(iconName);
+                if (context.locale.toString() == "en")
+                  widget.setSelectedTitle(icon.mostLikelyCategoryName);
+                setState(() {
+                  selectedImage = iconName;
+                });
+                Future.delayed(Duration(milliseconds: 70), () {
+                  popRoute(context);
+                  if (widget.next != null) {
+                    widget.next!();
+                  }
+                });
+              },
+            ),
+          if (iconSource == IconSource.illustrations) // AMEEN
           Center(
             child: Wrap(
               alignment: WrapAlignment.center,

@@ -1,3 +1,5 @@
+import 'package:budget/ameen/materialCategoryIcon.dart';
+import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -138,6 +140,9 @@ class CategoryIcon extends StatelessWidget {
                           ? CacheCategoryIcon(
                               iconName: category.iconName ?? "",
                               size: size,
+                              color: HexColor(category.colour, // AMEEN
+                                  defaultColor:
+                                      Theme.of(context).colorScheme.primary),
                             )
                           : ColorFiltered(
                               colorFilter: ColorFilter.mode(
@@ -226,10 +231,12 @@ class CacheCategoryIcon extends StatefulWidget {
   const CacheCategoryIcon({
     required this.iconName,
     required this.size,
+    this.color, // AMEEN: colour of Material icons
     super.key,
   });
   final String iconName;
   final double size;
+  final Color? color;
   @override
   State<CacheCategoryIcon> createState() => _CacheCategoryIconState();
 }
@@ -261,12 +268,16 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
 
   @override
   void didChangeDependencies() {
-    precacheImage(image.image, context);
+    if (!isMaterialIcon(widget.iconName)) // AMEEN
+      precacheImage(image.image, context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isMaterialIcon(widget.iconName)) // AMEEN
+      return MaterialCategoryIcon(
+          iconName: widget.iconName, size: widget.size, color: widget.color);
     return image;
   }
 }

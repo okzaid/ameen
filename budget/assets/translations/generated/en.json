@@ -1185,5 +1185,7 @@
   "website": "Website",
   "terms-of-use": "Terms of Use",
   "based-on-app": "Based on {upstream}",
-  "based-on-app-description": "{app} is built on {upstream}, the open-source budgeting app by {author}, licensed under GPL-3.0. Tap to see the original credits, translators and acknowledgements."
+  "based-on-app-description": "{app} is built on {upstream}, the open-source budgeting app by {author}, licensed under GPL-3.0. Tap to see the original credits, translators and acknowledgements.",
+  "material-icons": "Icons",
+  "illustrated-icons": "Illustrations"
 }

@@ -40,3 +40,6 @@ if upstream changed the translation files.
 | About us | `lib/pages/settingsPage.dart`, `lib/widgets/navigationFramework.dart` | open `AboutUsPage` (`lib/ameen/aboutUsPage.dart`) instead of `AboutPage`; upstream About page is opened from the "Based on Cashew" card |
 | AED sign | `lib/struct/currencyFunctions.dart` | `applyAmeenCurrencyOverrides` after loading currencies.json (`lib/ameen/currencyOverrides.dart`) |
 | AED sign | `assets/fonts/Inter-Regular.ttf`, `Inter-Bold.ttf` | U+20C3 glyph added by `scripts/add_dirham_glyph.py`. If upstream updates these fonts: take theirs, re-run the script |
+| Material icons | `lib/widgets/categoryIcon.dart` | `CacheCategoryIcon` renders `ms:` icons via `MaterialCategoryIcon`, optional `color` param |
+| Material icons | `lib/widgets/pieChart.dart`, `lib/widgets/categoryEntry.dart` | pass `color` to `CacheCategoryIcon` |
+| Material icons | `lib/widgets/selectCategoryImage.dart` | Icons / Illustrations toggle and Material grid (`lib/ameen/materialIconPicker.dart`) |

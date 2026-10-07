@@ -451,6 +451,7 @@ class _Badge extends StatelessWidget {
                         : CacheCategoryIcon(
                             iconName: iconName,
                             size: 34,
+                            color: categoryColor, // AMEEN
                           ),
                   ),
                 ),

@@ -528,6 +528,8 @@ class CategoryIconPercent extends StatelessWidget {
               child: CacheCategoryIcon(
                 iconName: category.iconName ?? "",
                 size: size,
+                color: HexColor(category.colour, // AMEEN
+                    defaultColor: Theme.of(context).colorScheme.primary),
               ),
             )
           : SizedBox.shrink(),
