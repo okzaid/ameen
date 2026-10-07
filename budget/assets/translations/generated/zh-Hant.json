@@ -472,7 +472,7 @@
   "error-getting-products": "獲取產品出錯",
   "error-getting-products-description": "連接到App Store的錯誤。請稍後再試。",
   "error-processing-order": "購買發生錯誤。請再試一次。",
-  "order-confirmation": "感謝您支持Cashew！",
+  "order-confirmation": "感謝您支持Ameen！",
   "any-previous-purchases-restored": "已恢復先前的購買",
   "already-purchased": "你已經購買過了",
   "current-plan": "目前方案",
@@ -1178,7 +1178,7 @@
   "loans-details": "貸款詳情",
   "set-details": "設定詳情",
   "import-warning": "進口警告",
-  "import-warning-description": "導入可能會失敗！請確保您選擇了有效的 Cashew [.sqlite] 或 [.sql] 備份文件",
+  "import-warning-description": "導入可能會失敗！請確保您選擇了有效的 Ameen [.sqlite] 或 [.sql] 備份文件",
   "duplicate-budget-question": "預算重複？",
   "duplicate-budget": "重複預算"
 }

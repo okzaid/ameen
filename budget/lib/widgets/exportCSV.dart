@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addBudgetPage.dart';
@@ -152,7 +153,7 @@ class ExportCSV extends StatelessWidget {
 
       String fileName;
       if (dateTimeRange != null) {
-        fileName = "cashew-" +
+        fileName = ameenFilePrefix + "-" + // AMEEN
             (DateTime.now().millisecondsSinceEpoch).toString() +
             "-" +
             dateTimeRange.start.year.toString() +
@@ -169,7 +170,7 @@ class ExportCSV extends StatelessWidget {
             ".csv";
       } else {
         fileName =
-            "cashew-" + cleanFileNameString(DateTime.now().toString()) + ".csv";
+            ameenFilePrefix + "-" + cleanFileNameString(DateTime.now().toString()) + ".csv";
       }
 
       await saveCSV(boxContext: boxContext, csv: csv, fileName: fileName);

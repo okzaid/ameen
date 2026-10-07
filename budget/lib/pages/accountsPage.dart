@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/main.dart';
@@ -351,7 +352,7 @@ class AccountsPageState extends State<AccountsPage> {
                                 borderRadius: 15,
                                 onTap: () {
                                   openUrl(
-                                      "https://cashewapp.web.app/policy.html");
+                                      ameenPrivacyPolicyUrl); // AMEEN
                                 },
                                 child: Padding(
                                   padding:

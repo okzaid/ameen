@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'dart:convert';
 
 import 'package:budget/colors.dart';
@@ -242,7 +243,7 @@ class _ImportCSVState extends State<ImportCSV> {
                       ? Icons.live_help_outlined
                       : Icons.live_help_rounded,
                   onPressed: () => openUrl(
-                      "https://cashewapp.web.app/faq.html#import-csv-data"),
+                      ameenFaqUrl + "#import-csv-data"),
                 )
               : null,
           title: "assign-columns".tr(),
@@ -831,7 +832,7 @@ Future saveSampleCSV({required BuildContext boxContext}) async {
       "",
     ]);
     String csv = ListToCsvConverter().convert(csvData);
-    String fileName = "cashew-import-template" +
+    String fileName = ameenFilePrefix + "-import-template" + // AMEEN
         DateTime.now().millisecondsSinceEpoch.toString() +
         ".csv";
     return saveCSV(boxContext: boxContext, csv: csv, fileName: fileName);

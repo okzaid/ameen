@@ -472,7 +472,7 @@
   "error-getting-products": "خطأ في الحصول على المنتجات",
   "error-getting-products-description": "كان هناك خطأ في الاتصال بمتجر التطبيقات. الرجاء إعادة المحاولة في وقت لاحق.",
   "error-processing-order": "كان هناك خطأ في عملية الشراء. حاول مرة اخرى.",
-  "order-confirmation": "شكرًا لك لدعمك Cashew",
+  "order-confirmation": "شكرًا لك لدعمك Ameen",
   "any-previous-purchases-restored": "تم استعادة أي عملية شراء سابقة",
   "already-purchased": "تم الشراء مسبقًا",
   "current-plan": "الخطة الحالية",
@@ -701,8 +701,8 @@
   "provide-email-question-description": "إذا قمت بكتابة بريدك الإلكتروني، يمكن للمطور التواصل معك حول اقتراحك!",
   "submit-anyway": "إرسال على أي حال",
   "go-back": "رجوع",
-  "export-data-file": "تصدير ملف بيانات Cashew",
-  "import-data-file": "استيراد ملف بيانات Cashew",
+  "export-data-file": "تصدير ملف بيانات Ameen",
+  "import-data-file": "استيراد ملف بيانات Ameen",
   "google-drive": "Google Drive",
   "backup-your-data-reminder": "نسخ احتياطي",
   "backup-your-data-reminder-description": "نسخ احتياطي  تلقائي",
@@ -1178,7 +1178,7 @@
   "loans-details": "تفاصيل القروض",
   "set-details": "تعيين التفاصيل",
   "import-warning": "تحذير الاستيراد",
-  "import-warning-description": "قد يفشل الاستيراد! الرجاء التأكد من تحديد ملف نسخة احتياطية صالح لـ Cashew [.sqlite] أو [.sql].",
+  "import-warning-description": "قد يفشل الاستيراد! الرجاء التأكد من تحديد ملف نسخة احتياطية صالح لـ Ameen [.sqlite] أو [.sql].",
   "duplicate-budget-question": "ميزانية مكررة؟",
   "duplicate-budget": "ميزانية مكررة"
 }

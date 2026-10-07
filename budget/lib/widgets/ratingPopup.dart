@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'dart:async';
 
 import 'package:budget/functions.dart';
@@ -124,7 +125,7 @@ class _RatingPopupState extends State<RatingPopup> {
                         ? Icons.open_in_new_outlined
                         : Icons.open_in_new_rounded,
                     onTap: () async {
-                      openUrl("https://cashewapp.web.app/faq.html");
+                      openUrl(ameenFaqUrl); // AMEEN
                     },
                   ),
               ],

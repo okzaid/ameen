@@ -26,8 +26,8 @@ import 'package:sa3_liquid/sa3_liquid.dart';
 import 'package:budget/widgets/openContainerNavigation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-bool premiumPopupEnabled = kIsWeb == false;
-bool tryStoreEnabled = kIsWeb == false && kDebugMode == false;
+bool premiumPopupEnabled = false; // AMEEN: all Pro features are free
+bool tryStoreEnabled = false; // AMEEN: no store connection
 StreamSubscription<List<PurchaseDetails>>? purchaseListener;
 Map<String, ProductDetails> storeProducts = {};
 Map<String, String> productIDs = {
@@ -1402,7 +1402,7 @@ class PremiumBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) return SizedBox.shrink();
+    if (kIsWeb || hidePremiumPopup()) return SizedBox.shrink(); // AMEEN
     double borderRadius = 15;
     bool purchased = appStateSettings["purchaseID"] != null;
 

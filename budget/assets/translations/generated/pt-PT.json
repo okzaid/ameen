@@ -472,7 +472,7 @@
   "error-getting-products": "Erro ao obter produtos",
   "error-getting-products-description": "Ocorreu um erro ao ligar-se à loja de aplicações. Por favor, tente novamente mais tarde.",
   "error-processing-order": "Ocorreu um erro no processamento da sua compra. Por favor, tente novamente.",
-  "order-confirmation": "Obrigado por apoiar o Cashew!",
+  "order-confirmation": "Obrigado por apoiar o Ameen!",
   "any-previous-purchases-restored": "Quaisquer compras anteriores foram restauradas",
   "already-purchased": "Já comprado",
   "current-plan": "Plano atual",
@@ -1178,7 +1178,7 @@
   "loans-details": "Detalhes dos empréstimos",
   "set-details": "Definir detalhes",
   "import-warning": "Aviso de importação",
-  "import-warning-description": "A importação pode falhar! Certifique-se de ter selecionado um arquivo de backup válido do Cashew [.sqlite] ou [.sql]",
+  "import-warning-description": "A importação pode falhar! Certifique-se de ter selecionado um arquivo de backup válido do Ameen [.sqlite] ou [.sql]",
   "duplicate-budget-question": "Orçamento duplicado?",
   "duplicate-budget": "Orçamento duplicado"
 }

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/exportCSV.dart';
@@ -39,7 +40,7 @@ Future saveDBFileToDevice({
 Future exportDB({required BuildContext boxContext}) async {
   await openLoadingPopupTryCatch(() async {
     String fileName =
-        "cashew-" + cleanFileNameString(DateTime.now().toString()) + ".sql";
+        ameenFilePrefix + "-" + cleanFileNameString(DateTime.now().toString()) + ".sql";
     await saveDBFileToDevice(boxContext: boxContext, fileName: fileName);
   });
 }

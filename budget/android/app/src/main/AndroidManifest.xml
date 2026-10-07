@@ -30,7 +30,7 @@
   </queries>
     <application
         android:requestLegacyExternalStorage="true"
-        android:label="Cashew"
+        android:label="Ameen"
         android:icon="@mipmap/ic_launcher">
         <!-- Use the new rendering engine Impeller (experimental) -->
         <!-- <meta-data
@@ -49,8 +49,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="cashewapp.web.app" android:pathPrefix="/addTransaction"/>
-                <data android:scheme="https" android:host="cashewapp.web.app" android:pathPrefix="/addTransactionRoute"/>
+                <data android:scheme="https" android:host="app.ameen.zaidshaikh.com" android:pathPrefix="/addTransaction"/>
+                <data android:scheme="https" android:host="app.ameen.zaidshaikh.com" android:pathPrefix="/addTransactionRoute"/>
             </intent-filter>
 
             <!-- Specifies an Android theme to apply to this Activity as soon as

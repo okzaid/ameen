@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/accountsPage.dart';
 import 'package:budget/pages/autoTransactionsPageEmail.dart';
@@ -113,7 +114,7 @@ class App extends StatelessWidget {
       themeAnimationDuration: Duration(milliseconds: 400),
       themeAnimationCurve: CustomDelayedCurve(),
       key: ValueKey('CashewAppMain'),
-      title: 'Cashew',
+      title: ameenAppName, // AMEEN
       theme: getLightTheme(),
       darkTheme: getDarkTheme(),
       scrollBehavior: ScrollBehaviorOverride(),

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/brand.dart';
 import 'dart:async';
 import 'package:budget/colors.dart';
 import 'package:budget/database/generatePreviewData.dart';
@@ -880,7 +881,7 @@ class _BackupManagementState extends State<BackupManagement> {
                     Expanded(
                       child: AboutInfoBox(
                         title: "web-app".tr(),
-                        link: "https://budget-track.web.app/",
+                        link: ameenWebAppUrl, // AMEEN
                         color: appStateSettings["materialYou"]
                             ? Theme.of(context).colorScheme.secondaryContainer
                             : getColor(context, "lightDarkAccentHeavyLight"),
@@ -1515,7 +1516,7 @@ Future<bool> saveDriveFileToDevice({
   await for (var data in response.stream) {
     dataStore.insertAll(dataStore.length, data);
   }
-  String fileName = "cashew-" +
+  String fileName = ameenFilePrefix + "-" + // AMEEN
       ((fileToSave.name ?? "") +
               cleanFileNameString(
                   (fileToSave.modifiedTime ?? DateTime.now()).toString()))
