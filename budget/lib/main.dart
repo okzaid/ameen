@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/brand.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/accountsPage.dart';
@@ -56,6 +57,7 @@ void main() async {
     await loadCurrencyJSON();
     await loadLanguageNamesJSON();
     await initializeSettings();
+    await migrateAmeenSettings(); // AMEEN
     tz.initializeTimeZones();
     final String? locationName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(locationName ?? "America/New_York"));

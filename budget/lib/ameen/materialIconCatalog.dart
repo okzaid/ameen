@@ -321,6 +321,8 @@ const List<MaterialIconForCategory> materialIconCatalog = [
   _I("smart_toy", Symbols.smart_toy_rounded, "AI Tools", ["ai", "bot", "chatgpt", "claude"]),
 
   // Misc
+  _I("folder", Symbols.folder_rounded, "Group", ["folder", "group"]),
+  _I("folder_copy", Symbols.folder_copy_rounded, "Groups", ["folder", "groups"]),
   _I("category", Symbols.category_rounded, "General", ["general", "other", "misc"]),
   _I("more_horiz", Symbols.more_horiz_rounded, "Other", ["other", "misc"]),
   _I("help", Symbols.help_rounded, "Unknown", ["unknown", "question"]),

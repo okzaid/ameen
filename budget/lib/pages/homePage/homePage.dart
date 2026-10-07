@@ -1,3 +1,5 @@
+import 'package:budget/ameen/accountGroupsPages.dart';
+import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
@@ -182,6 +184,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       "walletsList": isHomeScreenSectionEnabled(context, "showWalletList")
           ? HomePageWalletList()
           : null,
+      accountGroupsHomeSection: // AMEEN
+          isHomeScreenSectionEnabled(context, accountGroupsHomeSetting)
+              ? HomePageAccountGroups()
+              : null,
       "budgets": isHomeScreenSectionEnabled(context, "showPinnedBudgets")
           ? HomePageBudgets()
           : null,

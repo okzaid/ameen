@@ -61,3 +61,8 @@ Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/
 | Text weight | `lib/widgets/textWidgets.dart` | `ameenFontWeight()` around TextFont weights (`lib/ameen/textWeight.dart`) |
 | Text weight | `lib/pages/settingsPage.dart` | `TextWeightSetting()` under the font picker |
 | Text weight | `lib/struct/defaultPreferences.dart`, `pubspec.yaml` | default font Metropolis, `ameenTextWeight: light`; Metropolis Light/Medium/SemiBold assets |
+| Group view | `lib/pages/homePage/homePage.dart`, `lib/pages/editHomePage.dart` | "Account Groups" home section (`lib/ameen/accountGroupsPages.dart`) |
+| Group view | `lib/struct/defaultPreferences.dart` | home section key + show settings |
+| Group view | `lib/main.dart` | `migrateAmeenSettings()` adds the section to saved home layouts |
+| Group view | `lib/pages/editWalletsPage.dart` | ⋮ "Group View" |
+| Group view | `lib/pages/addWalletPage.dart` | `initialGroupPk` (Add Account from a group) |

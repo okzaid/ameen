@@ -43,12 +43,14 @@ class AddWalletPage extends StatefulWidget {
     this.wallet,
     required this.routesToPopAfterDelete,
     this.runWhenOpen,
+    this.initialGroupPk, // AMEEN
   }) : super(key: key);
 
   //When a wallet is passed in, we are editing that wallet
   final TransactionWallet? wallet;
   final RoutesToPopAfterDelete routesToPopAfterDelete;
   final VoidCallback? runWhenOpen;
+  final String? initialGroupPk; // AMEEN: preselected group for new accounts
 
   @override
   _AddWalletPageState createState() => _AddWalletPageState();
@@ -62,7 +64,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
       widget.wallet?.colour == null ? null : HexColor(widget.wallet?.colour);
   String? selectedIconName;
   late String? selectedGroupPk = widget.wallet == null // AMEEN
-      ? null
+      ? widget.initialGroupPk
       : walletGroupPkOf(widget.wallet!.walletPk);
   Map<String, dynamic> currencies = {};
   bool customCurrencyIcon = false;

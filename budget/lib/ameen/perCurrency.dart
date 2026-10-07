@@ -203,8 +203,10 @@ class CurrencyTotalsText extends StatelessWidget {
     this.textColor,
     this.textAlign = TextAlign.start,
     this.absoluteValue = false,
+    this.autoSize = true,
     super.key,
   });
+  final bool autoSize;
   final AllWallets allWallets;
   final List<CurrencyTotal> totals;
   final double fontSize;
@@ -242,8 +244,8 @@ class CurrencyTotalsText extends StatelessWidget {
             textColor: textColor,
             textAlign: textAlign,
             maxLines: 1,
-            autoSizeText: true,
-            minFontSize: fontSize * 0.5,
+            autoSizeText: autoSize,
+            minFontSize: autoSize ? fontSize * 0.5 : null,
           ),
       ],
     );

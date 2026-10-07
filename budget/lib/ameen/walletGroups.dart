@@ -1,8 +1,12 @@
+import 'package:budget/widgets/textInput.dart';
+import 'package:budget/widgets/selectColor.dart';
+import 'package:budget/widgets/button.dart';
+import 'package:budget/widgets/navigationFramework.dart';
+import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
@@ -19,7 +23,7 @@ import 'package:budget/widgets/textWidgets.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' hide TextInput;
 import 'package:provider/provider.dart';
 
 // Account groups (e.g. "Banks", "Cash", "Cards").
@@ -35,13 +39,22 @@ const String walletGroupsSetting = "ameenWalletGroups";
 const String walletGroupOfSetting = "ameenWalletGroupOf";
 
 class WalletGroup {
-  WalletGroup({required this.pk, required this.name});
+  WalletGroup({required this.pk, required this.name, this.iconName, this.colour});
   final String pk;
   String name;
+  // Same format as account icons (see walletIcon.dart)
+  String? iconName;
+  // Hex colour like upstream's category/account colours
+  String? colour;
 
-  Map<String, dynamic> toJson() => {"pk": pk, "name": name};
-  static WalletGroup fromJson(dynamic json) =>
-      WalletGroup(pk: json["pk"].toString(), name: json["name"].toString());
+  Map<String, dynamic> toJson() =>
+      {"pk": pk, "name": name, "iconName": iconName, "colour": colour};
+  static WalletGroup fromJson(dynamic json) => WalletGroup(
+        pk: json["pk"].toString(),
+        name: json["name"].toString(),
+        iconName: json["iconName"]?.toString(),
+        colour: json["colour"]?.toString(),
+      );
 }
 
 List<WalletGroup> getWalletGroups() {
@@ -89,6 +102,116 @@ Future _saveWalletGroups(List<WalletGroup> groups) async {
     [for (WalletGroup group in groups) group.toJson()],
     updateGlobalState: false,
   );
+  homePageStateKey.currentState?.refreshState();
+}
+
+Future updateWalletGroup(String groupPk,
+    {required String name, String? iconName, String? colour}) async {
+  List<WalletGroup> groups = getWalletGroups();
+  for (WalletGroup group in groups) {
+    if (group.pk == groupPk) {
+      group.name = name.trim();
+      group.iconName = iconName;
+      group.colour = colour;
+    }
+  }
+  await _saveWalletGroups(groups);
+}
+
+// Name, icon and colour of a group in one sheet (null creates a new group).
+// Returns the group's pk when saved.
+Future<String?> openWalletGroupEditor(
+    BuildContext context, WalletGroup? group) async {
+  String? savedPk;
+  await openBottomSheet(
+    context,
+    popupWithKeyboard: true,
+    PopupFramework(
+      title: group == null
+          ? "add-account-group".tr()
+          : "edit-account-group".tr(),
+      child: _WalletGroupEditor(
+        group: group,
+        onSaved: (pk) => savedPk = pk,
+      ),
+    ),
+  );
+  return savedPk;
+}
+
+class _WalletGroupEditor extends StatefulWidget {
+  const _WalletGroupEditor({required this.group, required this.onSaved});
+  final WalletGroup? group;
+  final Function(String pk) onSaved;
+
+  @override
+  State<_WalletGroupEditor> createState() => _WalletGroupEditorState();
+}
+
+class _WalletGroupEditorState extends State<_WalletGroupEditor> {
+  late String name = widget.group?.name ?? "";
+  late String? iconName = widget.group?.iconName;
+  late Color? colour =
+      widget.group?.colour == null ? null : HexColor(widget.group?.colour);
+
+  Future save() async {
+    if (name.trim() == "") return;
+    String pk;
+    if (widget.group == null) {
+      pk = (await createWalletGroup(name)).pk;
+    } else {
+      pk = widget.group!.pk;
+    }
+    await updateWalletGroup(pk,
+        name: name, iconName: iconName, colour: toHexString(colour));
+    widget.onSaved(pk);
+    popRoute(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            WalletIconPicker(
+              iconName: iconName,
+              color: colour,
+              onChanged: (value) => setState(() => iconName = value),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: TextInput(
+                labelText: "account-group-name-placeholder".tr(),
+                initialValue: name,
+                autoFocus: widget.group == null,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (value) => setState(() => name = value),
+                onSubmitted: (_) => save(),
+                padding: EdgeInsetsDirectional.zero,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Container(
+          height: 65,
+          child: SelectColor(
+            horizontalList: true,
+            selectedColor: colour,
+            setSelectedColor: (value) => setState(() => colour = value),
+          ),
+        ),
+        SizedBox(height: 15),
+        Button(
+          label: widget.group == null ? "add-account-group".tr() : "save-changes".tr(),
+          onTap: save,
+          disabled: name.trim() == "",
+          expandedLayout: true,
+        ),
+      ],
+    );
+  }
 }
 
 Future _saveWalletGroupOf(Map<String, String> groupOf) async {
@@ -335,37 +458,8 @@ class _TotalsHeader extends StatelessWidget {
   }
 }
 
-Future<String?> openWalletGroupNamePopup(BuildContext context,
-    {String? initialName, required bool isNew}) async {
-  String? result;
-  await openBottomSheet(
-    context,
-    popupWithKeyboard: true,
-    PopupFramework(
-      title: isNew ? "add-account-group".tr() : "rename-account-group".tr(),
-      child: SelectText(
-        buttonLabel: isNew ? "add-account-group".tr() : "set-name".tr(),
-        selectedText: initialName,
-        icon: appStateSettings["outlinedIcons"]
-            ? Icons.folder_outlined
-            : Icons.folder_rounded,
-        placeholder: "account-group-name-placeholder".tr(),
-        setSelectedText: (_) {},
-        nextWithInput: (text) {
-          if (text.trim() != "") result = text.trim();
-        },
-        textCapitalization: TextCapitalization.words,
-        autoFocus: true,
-      ),
-    ),
-  );
-  return result;
-}
-
 Future<String?> createWalletGroupFlow(BuildContext context) async {
-  String? name = await openWalletGroupNamePopup(context, isNew: true);
-  if (name == null) return null;
-  return (await createWalletGroup(name)).pk;
+  return await openWalletGroupEditor(context, null);
 }
 
 Future<bool> deleteWalletGroupFlow(
@@ -447,12 +541,10 @@ Future editWalletGroupOptions(BuildContext context, WalletGroup group) async {
     icon: appStateSettings["outlinedIcons"]
         ? Icons.folder_outlined
         : Icons.folder_rounded,
-    onSubmitLabel: "rename".tr(),
+    onSubmitLabel: "edit".tr(),
     onSubmit: () async {
       popRoute(context);
-      String? name = await openWalletGroupNamePopup(context,
-          initialName: group.name, isNew: false);
-      if (name != null) await renameWalletGroup(group.pk, name);
+      await openWalletGroupEditor(context, group);
     },
     onCancelLabel: "delete".tr(),
     onCancel: () async {
@@ -539,9 +631,7 @@ class _EditWalletGroupsPageState extends State<EditWalletGroupsPage> {
               currentReorder: currentReorder != -1 && currentReorder != index,
               openPage: SizedBox.shrink(),
               onTap: () async {
-                String? name = await openWalletGroupNamePopup(context,
-                    initialName: group.name, isNew: false);
-                if (name != null) await renameWalletGroup(group.pk, name);
+                await openWalletGroupEditor(context, group);
                 setState(() {});
               },
               onDelete: () async {
@@ -573,5 +663,22 @@ class _EditWalletGroupsPageState extends State<EditWalletGroupsPage> {
         SliverToBoxAdapter(child: SizedBox(height: 85)),
       ],
     );
+  }
+}
+
+// Home page section key for the account groups row
+const String accountGroupsHomeSection = "ameenAccountGroups";
+const String accountGroupsHomeSetting = "showAmeenAccountGroups";
+
+// Called once at startup: existing installs get the new home section in their
+// saved home page order (disabled by default, so their home doesn't change)
+Future migrateAmeenSettings() async {
+  for (String orderKey in ["homePageOrder", "homePageOrderFullScreen"]) {
+    List<dynamic>? order = appStateSettings[orderKey];
+    if (order == null || order.contains(accountGroupsHomeSection)) continue;
+    List<dynamic> updated = [...order];
+    int index = updated.indexOf("walletsList");
+    updated.insert(index == -1 ? 0 : index + 1, accountGroupsHomeSection);
+    await updateSettings(orderKey, updated, updateGlobalState: false);
   }
 }

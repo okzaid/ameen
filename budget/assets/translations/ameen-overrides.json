@@ -26,6 +26,12 @@
     "text-weight": "Text Weight",
     "text-weight-regular": "Regular",
     "text-weight-light": "Light",
-    "text-weight-lighter": "Lighter"
+    "text-weight-lighter": "Lighter",
+    "edit-account-groups": "Edit Groups",
+    "edit-account-group": "Edit Group",
+    "delete-account-group": "Delete Group",
+    "no-accounts-in-group": "No accounts in this group yet",
+    "all-groups": "All groups",
+    "group-view": "Group View"
   }
 }

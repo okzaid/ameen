@@ -47,6 +47,8 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showWalletSwitcherFullScreen": true,
     "showWalletList": false,
     "showWalletListFullScreen": false,
+    "showAmeenAccountGroups": false, // AMEEN
+    "showAmeenAccountGroupsFullScreen": false, // AMEEN
     "showPinnedBudgets": true,
     "showPinnedBudgetsFullScreen": true,
     "showObjectives": false,
@@ -75,6 +77,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "homePageOrder": [
       "wallets",
       "walletsList",
+      "ameenAccountGroups", // AMEEN
       "budgets",
       "objectives",
       "allSpendingSummary",
@@ -90,6 +93,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "homePageOrderFullScreen": [
       "wallets",
       "walletsList",
+      "ameenAccountGroups", // AMEEN
       "budgets",
       "ORDER:LEFT",
       "objectives",

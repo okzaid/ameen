@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/addTransactionPage.dart';
@@ -95,6 +96,18 @@ class _EditHomePageState extends State<EditHomePage> {
                 useCustomController: true,
               );
             },
+          ),
+          accountGroupsHomeSection: EditHomePageItem( // AMEEN
+            icon: appStateSettings["outlinedIcons"]
+                ? Icons.folder_copy_outlined
+                : Icons.folder_copy_rounded,
+            name: "account-groups".tr(),
+            isEnabled:
+                isHomeScreenSectionEnabled(context, accountGroupsHomeSetting),
+            onSwitched: (value) {
+              switchHomeScreenSection(context, accountGroupsHomeSetting, value);
+            },
+            onTap: () => pushRoute(context, EditWalletGroupsPage()),
           ),
           "walletsList": EditHomePageItem(
             icon: appStateSettings["outlinedIcons"]

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/accountGroupsPages.dart';
 import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/ameen/walletIcon.dart';
@@ -108,6 +109,14 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                     ),
                   );
                 },
+              ),
+              DropdownItemMenu( // AMEEN
+                id: "group-view",
+                label: "group-view".tr(),
+                icon: appStateSettings["outlinedIcons"]
+                    ? Icons.folder_copy_outlined
+                    : Icons.folder_copy_rounded,
+                action: () => pushRoute(context, AccountGroupsPage()),
               ),
               DropdownItemMenu(
                 id: "settings",
