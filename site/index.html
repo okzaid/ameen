@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ameen · Budgeting you can trust</title>
+  <meta name="description" content="Ameen is a free, private budgeting app. Every currency kept separate, accounts in groups, and the new UAE Dirham sign built in.">
+  <meta name="theme-color" content="#0F5C4D">
+  <meta property="og:title" content="Ameen · Budgeting you can trust">
+  <meta property="og:description" content="Free, private budgeting. Every currency kept separate, accounts in groups, the new Dirham sign built in.">
+  <meta property="og:image" content="https://ameen.zaidshaikh.com/img/icon-1024.png">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&display=block">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="/"><img src="img/icon-192.png" alt="">Ameen</a>
+    <nav class="links">
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="faq.html">FAQ</a>
+      <a class="btn primary" href="https://app.ameen.zaidshaikh.com">Open app</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>Your money, kept <span class="accent">faithfully</span>.</h1>
+      <p class="lead">Ameen is a free, private budgeting app. Track every account in its own currency, organise them into groups, and see exactly where you stand.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#get"><span class="ms">android</span>Get it on Android</a>
+        <a class="btn secondary" href="https://app.ameen.zaidshaikh.com"><span class="ms">language</span>Use on the web</a>
+      </div>
+      <p class="note">Free forever. No ads, no account required. Your data stays on your device.</p>
+    </div>
+
+    <!-- Live recreation of the app home screen -->
+    <div class="device" aria-label="Ameen home screen preview">
+      <h3 class="page">Home</h3>
+      <div class="cards" id="wallets"></div>
+      <div class="row2">
+        <div class="box"><div class="label">Expense</div><div class="val expense" id="exp"></div><div class="sub">12 transactions</div></div>
+        <div class="box"><div class="label">Income</div><div class="val income" id="inc"></div><div class="sub">3 transactions</div></div>
+      </div>
+      <div class="box" style="margin-top:10px"><div class="label">Net Worth</div><div class="val" id="nw"></div><div class="sub">tap an account to make it primary</div></div>
+      <div class="setting">
+        <span class="ms">currency_exchange</span>
+        <div class="t"><b>Totals per Currency</b><span>Show each currency separately</span></div>
+        <button class="switch" id="perCurrency" role="switch" aria-checked="true" aria-label="Totals per currency"></button>
+      </div>
+    </div>
+  </div>
+
+  <section class="block alt" id="features">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Every currency, honestly</div>
+        <h2>No more guessing what your dirhams are worth in dollars.</h2>
+        <p class="sec">Most apps squash everything into one currency with an exchange rate you never chose. Ameen shows each currency on its own line. Flip the switch above if you'd rather see one converted total.</p>
+        <div class="dirham" aria-label="UAE Dirham sign">&#x20C3;</div>
+        <p class="sec" style="margin-top:12px">The new UAE Dirham sign is built in, so AED amounts look the way they should.</p>
+      </div>
+      <!-- Live accounts page with groups -->
+      <div class="panel" aria-label="Accounts page preview">
+        <div class="total-h"><span>Total</span><span class="tot" id="groupsTotal"></span></div>
+        <div id="groups"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap split flip">
+      <div>
+        <div class="eyebrow">Account groups</div>
+        <h2>Banks, cash, cards. Grouped, with their own totals.</h2>
+        <p class="sec">Put accounts into groups you name yourself. Each group shows what it holds in every currency, and dragging an account moves it between groups.</p>
+        <div class="eyebrow" style="margin-top:34px">Icons that make sense</div>
+        <h2>Hundreds of icons for every category and account.</h2>
+        <p class="sec">Pick from Material icons, illustrations or any emoji. Try it: search below.</p>
+      </div>
+      <!-- Live icon picker -->
+      <div class="panel" aria-label="Icon picker preview">
+        <div class="picker-search"><span class="ms" style="color:var(--text-light)">search</span><input id="iconSearch" placeholder="Search icons, e.g. fuel, salary, coffee" aria-label="Search icons"></div>
+        <div class="chips"><button class="chip on" tabindex="-1">Icons</button><button class="chip" tabindex="-1">Illustrations</button></div>
+        <div class="grid-icons" id="iconGrid"></div>
+        <div class="picked"><div class="tile"><span class="ms" id="pickedIcon">account_balance</span></div><b id="pickedName">Bank</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <div class="eyebrow">Everything included</div>
+      <h2>All features, free.</h2>
+      <p class="sec">No subscriptions and no locked features.</p>
+      <div class="features">
+        <div class="feature"><span class="ms">donut_large</span><h3>Budgets</h3><p>As many budgets as you like, with past periods and spending trends.</p></div>
+        <div class="feature"><span class="ms">flag</span><h3>Goals and loans</h3><p>Save towards goals and keep track of money lent and borrowed.</p></div>
+        <div class="feature"><span class="ms">autorenew</span><h3>Subscriptions</h3><p>Recurring and upcoming payments, with reminders before they're due.</p></div>
+        <div class="feature"><span class="ms">lock</span><h3>Private by design</h3><p>Data stays on your device. Optional backup to your own Google Drive.</p></div>
+        <div class="feature"><span class="ms">devices</span><h3>Phone and web</h3><p>Use it on Android or in any browser.</p></div>
+        <div class="feature"><span class="ms">code</span><h3>Open source</h3><p>Built on Cashew and published under GPL-3.0. Read every line.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block cta" id="get">
+    <div class="wrap">
+      <img src="img/icon-192.png" alt="Ameen app icon">
+      <h2>Start budgeting with Ameen.</h2>
+      <p class="sec" style="margin:0 auto 26px">Android app coming soon to Google Play. The web app works today.</p>
+      <div class="ctas" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="btn primary" href="https://app.ameen.zaidshaikh.com"><span class="ms">open_in_new</span>Open the web app</a>
+        <a class="btn secondary" href="https://github.com/okzaid/ameen"><span class="ms">code</span>Source code</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Ameen. Based on <a href="https://github.com/jameskokoska/Cashew" style="text-decoration:underline">Cashew</a> by James Kokoska, GPL-3.0.</span>
+    <nav><a href="faq.html">FAQ</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="https://github.com/okzaid/ameen">GitHub</a></nav>
+  </div>
+</footer>
+
+<script>
+// Sample data driving the live previews (mirrors the app's model)
+const RATES = { aed: 1, usd: 3.6725 }; // to AED
+const SYM = { aed: "⃃", usd: "$" };
+const wallets = [
+  { name: "Emirates NBD", icon: "account_balance", color: "#0F5C4D", cur: "aed", amt: 18450, n: 42, group: "Banks" },
+  { name: "Savings", icon: "savings", color: "#5A8DCA", cur: "usd", amt: 3200, n: 6, group: "Banks" },
+  { name: "Wallet", icon: "payments", color: "#CA995A", cur: "aed", amt: 640, n: 18, group: "Cash" },
+  { name: "Credit Card", icon: "credit_card", color: "#CA5A5A", cur: "aed", amt: -2310, n: 27, group: "Cards" },
+];
+let primary = 0;
+const fmt = (v, c) => (v < 0 ? "-" : "") + SYM[c] + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const perCurrencySwitch = document.getElementById("perCurrency");
+const perCurrency = () => perCurrencySwitch.getAttribute("aria-checked") === "true";
+
+function totals(list, key = w => w.amt) {
+  const t = {};
+  list.forEach(w => t[w.cur] = (t[w.cur] || 0) + key(w));
+  return t;
+}
+function totalsHTML(t) {
+  const base = wallets[primary].cur;
+  if (!perCurrency() || Object.keys(t).length === 1) {
+    if (Object.keys(t).length === 1) { const c = Object.keys(t)[0]; return fmt(t[c], c); }
+    let sum = 0; for (const c in t) sum += t[c] * RATES[c] / RATES[base];
+    return fmt(Math.round(sum), base);
+  }
+  return Object.entries(t).map(([c, v]) => `<div>${fmt(v, c)}</div>`).join("");
+}
+function render() {
+  document.getElementById("wallets").innerHTML = wallets.map((w, i) => `
+    <div class="wallet ${i === primary ? "selected" : ""}" style="--wc:${w.color}" data-i="${i}" role="button" tabindex="0">
+      <span class="ms ico">${w.icon}</span>
+      <div class="name">${w.name}</div><div class="amt">${fmt(w.amt, w.cur)}</div>
+      <div class="cnt">${w.n} transactions</div>
+    </div>`).join("");
+  document.querySelectorAll(".wallet").forEach(el => el.onclick = () => { primary = +el.dataset.i; render(); });
+  document.getElementById("nw").innerHTML = totalsHTML(totals(wallets));
+  document.getElementById("exp").innerHTML = totalsHTML({ aed: 4280, usd: 120 });
+  document.getElementById("inc").innerHTML = totalsHTML({ aed: 15000, usd: 400 });
+  document.getElementById("groupsTotal").innerHTML = totalsHTML(totals(wallets));
+  const groups = [...new Set(wallets.map(w => w.group))];
+  document.getElementById("groups").innerHTML = groups.map(g => {
+    const m = wallets.filter(w => w.group === g);
+    return `<div class="group-h"><div><b>${g}</b><small>${m.length} account${m.length > 1 ? "s" : ""}</small></div><div class="tot">${totalsHTML(totals(m))}</div></div>` +
+      m.map(w => `<div class="acct" style="--wc:${w.color}"><span class="ms">${w.icon}</span><span class="n">${w.name}</span><span class="a">${fmt(w.amt, w.cur)}</span></div>`).join("");
+  }).join("");
+}
+perCurrencySwitch.onclick = () => { perCurrencySwitch.setAttribute("aria-checked", perCurrency() ? "false" : "true"); render(); };
+render();
+
+// Icon picker: a slice of the app's Material icon catalog
+const ICONS = [
+  ["account_balance","Bank","bank account"],["savings","Savings","piggy save"],["payments","Cash","money notes"],["credit_card","Credit Card","card visa"],
+  ["wallet","Wallet","purse"],["restaurant","Dining","food eat"],["local_cafe","Coffee","cafe tea karak"],["local_grocery_store","Groceries","supermarket"],
+  ["shopping_bag","Shopping","mall"],["local_gas_station","Fuel","petrol adnoc enoc gas"],["local_taxi","Taxi","careem uber cab"],["subway","Metro","nol transport"],
+  ["toll","Tolls","salik"],["flight","Flights","travel airline"],["hotel","Hotels","stay"],["home","Home","house"],["apartment","Rent","flat"],
+  ["bolt","Electricity","dewa power utilities"],["water_drop","Water","utilities"],["wifi","Internet","broadband"],["smartphone","Phone","mobile du etisalat"],
+  ["live_tv","Streaming","netflix"],["fitness_center","Gym","fitness"],["medical_services","Medical","doctor health"],["school","Education","school fees"],
+  ["pets","Pets","dog cat"],["child_care","Childcare","baby"],["volunteer_activism","Charity","zakat sadaqah donation"],["mosque","Mosque","masjid"],
+  ["work","Salary","income job"],["trending_up","Investments","stocks"],["redeem","Gifts","present"],["sports_esports","Gaming","games"],
+  ["checkroom","Clothing","fashion"],["content_cut","Haircut","barber salon"],["local_parking","Parking","rta"],["send_money","Remittance","transfer home"],
+];
+const grid = document.getElementById("iconGrid");
+let picked = "account_balance";
+function renderIcons(q = "") {
+  q = q.trim().toLowerCase();
+  const list = ICONS.filter(([n, l, t]) => !q || n.replace(/_/g, " ").includes(q) || l.toLowerCase().includes(q) || t.includes(q));
+  grid.innerHTML = list.map(([n, l]) => `<button class="${n === picked ? "on" : ""}" data-n="${n}" data-l="${l}" aria-label="${l}"><span class="ms">${n}</span></button>`).join("") ||
+    `<p style="grid-column:1/-1;color:var(--text-light);margin:8px">No icons found</p>`;
+  grid.querySelectorAll("button").forEach(b => b.onclick = () => {
+    picked = b.dataset.n;
+    document.getElementById("pickedIcon").textContent = picked;
+    document.getElementById("pickedName").textContent = b.dataset.l;
+    renderIcons(document.getElementById("iconSearch").value);
+  });
+}
+document.getElementById("iconSearch").oninput = e => renderIcons(e.target.value);
+renderIcons();
+</script>
+</body>
+</html>
