@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -266,10 +267,22 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                       content: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextFont(
-                            text: wallet.name,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 21,
+                          Row(
+                            children: [
+                              if (walletHasIcon(wallet)) // AMEEN
+                                Padding(
+                                  padding:
+                                      const EdgeInsetsDirectional.only(end: 8),
+                                  child: WalletIcon(wallet: wallet, size: 24),
+                                ),
+                              Flexible(
+                                child: TextFont(
+                                  text: wallet.name,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 21,
+                                ),
+                              ),
+                            ],
                           ),
                           Container(height: 2),
                           TextFont(

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addWalletPage.dart';
@@ -66,7 +67,10 @@ class WalletEntry extends StatelessWidget {
                     PositionedDirectional(
                       end: -11,
                       top: -5,
-                      child: Container(
+                      child: walletHasIcon(walletWithDetails.wallet) // AMEEN
+                          ? WalletIcon(
+                              wallet: walletWithDetails.wallet, size: 24)
+                          : Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadiusDirectional.circular(100),
                           color: HexColor(walletWithDetails.wallet.colour,
@@ -224,6 +228,14 @@ class WalletEntryRow extends StatelessWidget {
                                   ),
                                 ),
                         ),
+                        if (isCurrencyRow == false &&
+                            walletHasIcon(walletWithDetails.wallet)) // AMEEN
+                          Padding(
+                            padding:
+                                const EdgeInsetsDirectional.only(start: 10),
+                            child: WalletIcon(
+                                wallet: walletWithDetails.wallet, size: 24),
+                          ),
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsetsDirectional.only(

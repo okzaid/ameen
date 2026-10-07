@@ -43,3 +43,6 @@ if upstream changed the translation files.
 | Material icons | `lib/widgets/categoryIcon.dart` | `CacheCategoryIcon` renders `ms:` icons via `MaterialCategoryIcon`, optional `color` param |
 | Material icons | `lib/widgets/pieChart.dart`, `lib/widgets/categoryEntry.dart` | pass `color` to `CacheCategoryIcon` |
 | Material icons | `lib/widgets/selectCategoryImage.dart` | Icons / Illustrations toggle and Material grid (`lib/ameen/materialIconPicker.dart`) |
+| Account icons | `lib/pages/addWalletPage.dart` | icon picker next to the name, saves `Wallets.iconName` (`lib/ameen/walletIcon.dart`) |
+| Account icons | `lib/widgets/walletEntry.dart`, `lib/pages/editWalletsPage.dart` | show the account icon |
+| Account icons | `lib/widgets/selectAmount.dart`, `lib/pages/transactionFilters.dart` | `getAvatar` on account chips |

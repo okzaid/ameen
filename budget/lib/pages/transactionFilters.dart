@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletIcon.dart';
 import 'dart:math';
 
 import 'package:budget/database/tables.dart';
@@ -816,6 +817,8 @@ class _TransactionFiltersSelectionState
 
         SelectChips(
           items: Provider.of<AllWallets>(context).list,
+          getAvatar: walletChipAvatarBuilder(
+              Provider.of<AllWallets>(context).list), // AMEEN
           onLongPress: (TransactionWallet? item) {
             pushRoute(
               context,

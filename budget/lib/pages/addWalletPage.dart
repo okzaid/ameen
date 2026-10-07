@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
@@ -124,6 +125,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
       order: widget.wallet != null ? widget.wallet!.order : numberOfWallets,
       currency: selectedCurrency,
       decimals: selectedDecimals,
+      iconName: selectedIconName, // AMEEN
       homePageWidgetDisplay: widget.wallet != null
           ? widget.wallet!.homePageWidgetDisplay
           : defaultWalletHomePageWidgetDisplay,
@@ -166,6 +168,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
           : HexColor(widget.wallet!.colour);
       selectedCurrency = widget.wallet!.currency ?? "usd";
       selectedDecimals = widget.wallet!.decimals;
+      selectedIconName = widget.wallet!.iconName; // AMEEN
     }
     populateCurrencies();
     Future.delayed(Duration.zero, () async {
@@ -437,19 +440,37 @@ class _AddWalletPageState extends State<AddWalletPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
-              child: TextInput(
-                autoFocus: kIsWeb && getIsFullScreen(context),
-                focusNode: _titleFocusNode,
-                labelText: "name-placeholder".tr(),
-                bubbly: false,
-                initialValue: selectedTitle,
-                onChanged: (text) {
-                  setSelectedTitle(text);
-                },
-                padding: EdgeInsetsDirectional.only(start: 7, end: 7),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                topContentPadding: 20,
+              // AMEEN: account icon next to the name, like the category page
+              child: Row(
+                children: [
+                  WalletIconPicker(
+                    iconName: selectedIconName,
+                    color: selectedColor,
+                    onChanged: (iconName) {
+                      setState(() {
+                        selectedIconName = iconName;
+                      });
+                      determineBottomButton();
+                    },
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: TextInput(
+                      autoFocus: kIsWeb && getIsFullScreen(context),
+                      focusNode: _titleFocusNode,
+                      labelText: "name-placeholder".tr(),
+                      bubbly: false,
+                      initialValue: selectedTitle,
+                      onChanged: (text) {
+                        setSelectedTitle(text);
+                      },
+                      padding: EdgeInsetsDirectional.only(start: 7, end: 7),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      topContentPadding: 20,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

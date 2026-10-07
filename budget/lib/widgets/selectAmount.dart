@@ -1,3 +1,4 @@
+import 'package:budget/ameen/walletIcon.dart';
 import 'dart:io';
 import 'dart:math';
 
@@ -800,6 +801,8 @@ class _SelectAmountState extends State<SelectAmount> {
                       child: SelectChips(
                         allowMultipleSelected: false,
                         items: Provider.of<AllWallets>(context).list,
+                        getAvatar: walletChipAvatarBuilder(
+                            Provider.of<AllWallets>(context).list), // AMEEN
                         onLongPress: (TransactionWallet? item) {
                           pushRoute(
                             context,
