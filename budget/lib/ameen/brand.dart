@@ -16,7 +16,7 @@ const String ameenPlayStoreUrl =
     "https://play.google.com/store/apps/details?id=" + ameenPackageName;
 
 const String ameenDeveloperName = "Zaid Shaikh";
-const String ameenContactEmail = "zaid@live.hk";
+const String ameenContactEmail = "contact@zaidshaikh.com";
 
 // Upstream project this app is based on (GPL-3.0)
 const String upstreamAppName = "Cashew";
