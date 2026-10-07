@@ -32,7 +32,7 @@ if upstream changed the translation files.
 | Brand | `lib/pages/settingsPage.dart`, `lib/widgets/ratingPopup.dart`, `lib/pages/accountsPage.dart` | FAQ / privacy links |
 | Brand | `lib/pages/autoTransactionsPageEmail.dart` | hard-coded app name in a hint |
 | Brand | `android/app/build.gradle` | `applicationId`; google-services plugin applied only when configured |
-| Brand | `android/app/src/main/AndroidManifest.xml` | label, App Links host |
+| Brand | `android/app/src/main/AndroidManifest.xml` | label, App Links host, BILLING permission removed |
 | Brand | `ios/Runner/Info.plist`, `ios/Runner/Runner.entitlements`, `ios/Runner.xcodeproj/project.pbxproj` | display name, usage strings, bundle id, associated domain |
 | Brand | `web/index.html`, `web/manifest.json` | title / meta |
 | Brand | `assets/translations/generate-translations.py` | runs `ameen-apply-overrides.py` at the end |
