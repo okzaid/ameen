@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/struct/settings.dart';
 import 'dart:convert';
 import 'package:budget/database/tables.dart';
@@ -9,6 +10,7 @@ Map<String, dynamic> currenciesJSON = {};
 loadCurrencyJSON() async {
   currenciesJSON = await json.decode(
       await rootBundle.loadString('assets/static/generated/currencies.json'));
+  applyAmeenCurrencyOverrides(currenciesJSON); // AMEEN
 }
 
 Future<bool> getExchangeRates() async {
