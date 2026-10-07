@@ -53,3 +53,6 @@ if upstream changed the translation files.
 | Per-currency totals / groups | `lib/struct/defaultPreferences.dart` | `ameen*` setting defaults |
 | Groups | `lib/pages/editWalletsPage.dart` | group/total headers around rows, group follows drag, settings entries |
 | Groups | `lib/pages/addWalletPage.dart` | group chips, saved after the account (`lib/ameen/walletGroups.dart`) |
+| CI | `.github/workflows/firebase-hosting-pull-request.yml` | upstream preview deploy only runs in the upstream repo |
+
+Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/workflows/upstream-sync.yml` (weekly upstream merge PR).

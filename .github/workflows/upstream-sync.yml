@@ -83,7 +83,7 @@ jobs:
         run: |
           flutter pub get
           flutter analyze --no-fatal-infos --no-fatal-warnings
-          flutter test
+          flutter test test/ameen
 
       - name: Open pull request (clean merge)
         if: steps.merge.outputs.conflicts == 'false'

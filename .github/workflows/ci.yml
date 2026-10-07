@@ -24,4 +24,5 @@ jobs:
       - run: flutter pub get
       - name: Analyze (errors only, upstream has existing warnings)
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
-      - run: flutter test
+      # Upstream's test/widget_test.dart is a non-working placeholder, so only Ameen tests run
+      - run: flutter test test/ameen
