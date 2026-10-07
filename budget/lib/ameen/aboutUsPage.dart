@@ -231,14 +231,6 @@ class _AboutUsLinks extends StatelessWidget {
             const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
             _linkRow(
               context,
-              isExternalLink: true,
-              onTap: () => openUrl(ameenTermsUrl),
-              icon: outlined ? Icons.gavel_outlined : Icons.gavel_rounded,
-              text: "terms-of-use".tr(),
-            ),
-            const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
-            _linkRow(
-              context,
               isExternalLink: false,
               onTap: () => openLicensesPage(context),
               icon: outlined
