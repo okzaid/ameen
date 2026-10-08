@@ -1,3 +1,4 @@
+import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -24,6 +25,8 @@ class TransactionEntryAmount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (showNativeTransactionAmounts()) // AMEEN: account currency first
+      return NativeTransactionAmount(transaction: transaction);
     double count = transaction.amount.abs() *
         (amountRatioToPrimaryCurrencyGivenPk(
             Provider.of<AllWallets>(context), transaction.walletFk));

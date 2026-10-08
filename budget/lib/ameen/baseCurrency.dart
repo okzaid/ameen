@@ -1,10 +1,7 @@
+import 'package:budget/ameen/currencySheet.dart';
 import 'package:budget/database/tables.dart';
-import 'package:budget/functions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/currencyPicker.dart';
-import 'package:budget/widgets/framework/popupFramework.dart';
-import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/settingsContainers.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
@@ -91,21 +88,17 @@ class BaseCurrencySetting extends StatelessWidget {
 }
 
 Future openBaseCurrencyPicker(BuildContext context) async {
-  await openBottomSheet(
+  AllWallets allWallets = Provider.of<AllWallets>(context, listen: false);
+  String? picked = await pickCurrencySheet(
     context,
-    fullSnap: true,
-    PopupFramework(
-      title: "base-currency".tr(),
-      subtitle: "base-currency-description".tr(),
-      child: CurrencyPicker(
-        initialCurrency:
-            baseCurrencyOf(Provider.of<AllWallets>(context, listen: false)),
-        showExchangeRateInfoNotice: true,
-        onSelected: (currencyKey) async {
-          await setBaseCurrency(currencyKey);
-          popRoute(context);
-        },
-      ),
-    ),
+    title: "base-currency".tr(),
+    subtitle: "base-currency-description".tr(),
+    selected: baseCurrencyOf(allWallets),
+    pinned: allWallets.list
+        .map((w) => w.currency)
+        .whereType<String>()
+        .toSet()
+        .toList(),
   );
+  if (picked != null) await setBaseCurrency(picked);
 }

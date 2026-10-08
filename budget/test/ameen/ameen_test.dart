@@ -2,6 +2,8 @@ import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/ameen/frequentWallets.dart';
+import 'package:budget/ameen/foreignAmount.dart';
+import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/photoIcons.dart';
 import 'dart:ui' as ui;
@@ -294,6 +296,82 @@ void main() {
           amountRatioToPrimaryCurrency(allWallets, "aed",
               appStateSettingsPassed: settings("usd")),
           closeTo(1 / 3.6725, 1e-9));
+    });
+  });
+
+  group("Note tags", () {
+    test("several tags round trip and stay hidden", () {
+      String note = noteWithAmeenTags("Dinner", {
+        baseRateTag: "AED>INR@22.730000",
+        locationTag: "25.204849,55.270783|Dubai",
+        foreignAmountTag: "USD 20.0@3.672500",
+      });
+      expect(noteWithoutAmeenTags(note), "Dinner");
+      Map<String, String> tags = ameenTagsOf(note);
+      expect(tags[locationTag], "25.204849,55.270783|Dubai");
+      expect(tags[foreignAmountTag], "USD 20.0@3.672500");
+      expect(tags[baseRateTag], "AED>INR@22.730000");
+      expect(locationOfNote(note)!.city, "Dubai");
+      expect(notePreviewWithCity(note), "Dinner  ·  📍 Dubai");
+    });
+    test("older location-only notes still read", () {
+      String old = "Taxi\n\u2063⌖25.204849,55.270783|Dubai";
+      expect(locationOfNote(old)!.city, "Dubai");
+      expect(noteWithoutAmeenTags(old), "Taxi");
+    });
+    test("empty tag set leaves the note alone", () {
+      expect(noteWithAmeenTags("Just a note", {}), "Just a note");
+      expect(noteWithAmeenTags("", {}), "");
+    });
+  });
+
+  group("Foreign amount", () {
+    test("payload, market charge, effective rate and fee", () {
+      ForeignAmount usd = ForeignAmount("usd", 20, 3.6725);
+      ForeignAmount parsed = ForeignAmount.fromPayload(usd.toPayload())!;
+      expect(parsed.currency, "usd");
+      expect(parsed.amount, 20);
+      expect(parsed.marketRate, closeTo(3.6725, 1e-9));
+      expect(usd.chargedAtMarket(2), 73.45);
+      expect(usd.effectiveRate(74.55), closeTo(3.7275, 1e-9));
+      expect(usd.feeFraction(74.55), closeTo(0.01497, 1e-4));
+      expect(ForeignAmount.fromPayload("garbage"), null);
+    });
+
+    test("saving records the base rate and drops a same-currency original", () async {
+      appStateSettings["ameenLocationTagging"] = false;
+      appStateSettings["ameenBaseCurrency"] = "inr";
+      appStateSettings["customCurrencyAmounts"] = {};
+      appStateSettings["cachedCurrencyExchange"] = {"usd": 1, "aed": 3.6725, "inr": 84.0};
+      AllWallets none = AllWallets(list: [], indexedByPk: {});
+      Map<String, String> tags = await tagsForSave(
+        tags: {foreignAmountTag: "USD 20.0@3.672500"},
+        isNew: true,
+        allWallets: none,
+        walletCurrency: "aed",
+      );
+      expect(tags[baseRateTag], startsWith("AED>INR@22.87"));
+      expect(tags[foreignAmountTag], "USD 20.0@3.672500");
+      Map<String, String> same = await tagsForSave(
+        tags: {foreignAmountTag: "USD 20.0@1.000000"},
+        isNew: false,
+        allWallets: none,
+        walletCurrency: "usd",
+      );
+      expect(same.containsKey(foreignAmountTag), false);
+      expect(same[baseRateTag], startsWith("USD>INR@84"));
+    });
+
+    test("changing the account re-converts the original", () {
+      appStateSettings["customCurrencyAmounts"] = {};
+      appStateSettings["cachedCurrencyExchange"] = {"usd": 1, "aed": 3.6725, "inr": 84.0};
+      TransactionWallet inrWallet = TransactionWallet(
+          walletPk: "i", name: "ICICI", dateCreated: DateTime(2026), order: 0,
+          decimals: 2, currency: "inr");
+      var (tags, charged) = reconvertForeignForWallet(
+          {foreignAmountTag: "USD 20.0@3.672500"}, inrWallet);
+      expect(charged, 1680.0);
+      expect(ForeignAmount.fromPayload(tags[foreignAmountTag])!.marketRate, 84.0);
     });
   });
 }

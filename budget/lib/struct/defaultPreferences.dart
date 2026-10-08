@@ -176,6 +176,8 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "ameenPerCurrencyTotals": true,
     "ameenTextWeight": "light",
     "ameenLocationTagging": true,
+    "ameenNativeTransactionAmounts": true,
+    "ameenRecentForeignCurrencies": [],
     "ameenWalletGroups": [], // [{"pk", "name", "iconName"}] in display order
     "ameenWalletGroupOf": {}, // {walletPk: groupPk}
     "allSpendingSummaryAllWallets": true,

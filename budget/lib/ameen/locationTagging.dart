@@ -1,3 +1,4 @@
+import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/settingsContainers.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -14,9 +15,8 @@ import 'package:geolocator/geolocator.dart';
 //   "<note>⁣⌖25.204849,55.270782|Dubai"
 
 const String locationTaggingSetting = "ameenLocationTagging";
-const String _tagStart = "⁣⌖";
-final RegExp _tagPattern = RegExp(
-    r"\n?⁣⌖(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:\|([^\n]*))?\s*$");
+final RegExp _locationPayload =
+    RegExp(r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:\|(.*))?$");
 
 class TransactionLocation {
   const TransactionLocation(this.latitude, this.longitude, this.city);
@@ -24,43 +24,47 @@ class TransactionLocation {
   final double longitude;
   final String? city;
 
-  String toTag() =>
-      _tagStart +
+  // Payload of the location tag (see noteTags.dart)
+  String toPayload() =>
       latitude.toStringAsFixed(6) +
       "," +
       longitude.toStringAsFixed(6) +
       (city == null || city == "" ? "" : "|" + city!.replaceAll("|", " "));
+
+  static TransactionLocation? fromPayload(String? payload) {
+    if (payload == null) return null;
+    RegExpMatch? match = _locationPayload.firstMatch(payload.trim());
+    if (match == null) return null;
+    double? lat = double.tryParse(match.group(1)!);
+    double? lng = double.tryParse(match.group(2)!);
+    if (lat == null || lng == null) return null;
+    String? city = match.group(3);
+    return TransactionLocation(lat, lng, city == "" ? null : city);
+  }
 }
 
 bool locationTaggingEnabled() =>
     appStateSettings[locationTaggingSetting] != false;
 
-TransactionLocation? locationOfNote(String? note) {
-  if (note == null) return null;
-  RegExpMatch? match = _tagPattern.firstMatch(note);
-  if (match == null) return null;
-  double? lat = double.tryParse(match.group(1)!);
-  double? lng = double.tryParse(match.group(2)!);
-  if (lat == null || lng == null) return null;
-  String? city = match.group(3);
-  return TransactionLocation(lat, lng, city == "" ? null : city);
-}
+TransactionLocation? locationOfNote(String? note) =>
+    TransactionLocation.fromPayload(ameenTagsOf(note)[locationTag]);
 
-// The note as the user wrote it
-String noteWithoutLocation(String? note) {
-  if (note == null) return "";
-  return note.replaceFirst(_tagPattern, "");
-}
+// The note as the user wrote it (without any Ameen tags)
+String noteWithoutLocation(String? note) => noteWithoutAmeenTags(note);
 
 String noteWithLocation(String note, TransactionLocation? location) {
-  String clean = noteWithoutLocation(note);
-  if (location == null) return clean;
-  return clean + (clean == "" ? "" : "\n") + location.toTag();
+  Map<String, String> tags = ameenTagsOf(note);
+  if (location == null) {
+    tags.remove(locationTag);
+  } else {
+    tags[locationTag] = location.toPayload();
+  }
+  return noteWithAmeenTags(note, tags);
 }
 
 // Note preview for transaction lists: the note plus "📍 City"
 String notePreviewWithCity(String? note) {
-  String clean = noteWithoutLocation(note).trim();
+  String clean = noteWithoutAmeenTags(note).trim();
   String? city = locationOfNote(note)?.city;
   if (city == null) return clean;
   return clean == "" ? "📍 " + city : clean + "  ·  📍 " + city;

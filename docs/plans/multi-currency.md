@@ -59,7 +59,7 @@ Cashew's reports.
 - "All" behaves like today: everything converted to base, labelled ≈.
 - Risk: medium. Needs a careful test pass of every report page with each lens.
 
-## Phase 3: Foreign spend on an account
+## Phase 3: Foreign spend on an account — done
 
 - Amount pad gets a **currency chip** next to the amount (default = account
   currency). Pick USD, type 20 → shows "≈ Đ73.45 at 3.6725 · tap to edit".

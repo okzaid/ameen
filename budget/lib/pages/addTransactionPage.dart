@@ -1,3 +1,5 @@
+import 'package:budget/ameen/noteTags.dart';
+import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/frequentWallets.dart';
@@ -371,6 +373,13 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     setState(() {
       selectedWalletPk = selectedWalletPkPassed;
     });
+    // AMEEN: keep a foreign original, convert it into the new account
+    var (tags, charged) = reconvertForeignForWallet(
+        ameenTags,
+        Provider.of<AllWallets>(context, listen: false)
+            .indexedByPk[selectedWalletPkPassed]);
+    ameenTags = tags;
+    if (charged != null) setSelectedAmount(charged, charged.toString());
   }
 
   Future<Transaction> addDefaultMissingValues(Transaction transaction) async {
@@ -470,8 +479,11 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         await addAssociatedTitles(selectedTitle!, selectedCategory!);
       }
 
-      if (widget.transaction == null) // AMEEN: location tagging
-        ameenLocation = await locationForNewTransaction();
+      ameenTags = await tagsForSave( // AMEEN: location, rates, foreign amount
+          tags: ameenTags,
+          isNew: widget.transaction == null,
+          allWallets: Provider.of<AllWallets>(context, listen: false),
+          walletCurrency: getSelectedWallet(listen: false)?.currency);
       Transaction createdTransaction = await createTransaction();
 
       if (widget.transaction != null) {
@@ -661,7 +673,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       amount: (selectedIncome || selectedAmount == 0 //Prevent negative 0
           ? (selectedAmount ?? 0).abs()
           : (selectedAmount ?? 0).abs() * -1),
-      note: noteWithLocation(_noteInputController.text, ameenLocation), // AMEEN
+      note: noteWithAmeenTags(_noteInputController.text, ameenTags), // AMEEN
       categoryFk: selectedCategory?.categoryPk ?? "-1",
       subCategoryFk: selectedSubCategory?.categoryPk,
       dateCreated: selectedDate,
@@ -727,7 +739,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
 
   late TextEditingController _titleInputController;
   late TextEditingController _noteInputController;
-  TransactionLocation? ameenLocation; // AMEEN
+  Map<String, String> ameenTags = {}; // AMEEN: hidden note tags
 
   @override
   void initState() {
@@ -735,7 +747,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     if (widget.transaction == null) // AMEEN
       refreshLocationInBackground();
     else
-      ameenLocation = locationOfNote(widget.transaction!.note);
+      ameenTags = ameenTagsOf(widget.transaction!.note);
     if (widget.transaction != null) {
       //We are editing a transaction
       //Fill in the information from the passed in transaction
@@ -966,24 +978,41 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         title: "enter-amount".tr(),
         hasPadding: false,
         underTitleSpace: false,
-        child: SelectAmount(
+        // AMEEN: "Paid in" currency for foreign spend
+        child: ForeignAmountPad(
+          getWallet: () => getSelectedWallet(listen: false),
+          initialForeign: foreignAmountOf(ameenTags),
+          initialAmount: selectedAmount,
+          onAmount: (charged, calculation, foreign) {
+            if (foreign == null) {
+              ameenTags.remove(foreignAmountTag);
+            } else {
+              ameenTags[foreignAmountTag] = foreign.toPayload();
+            }
+            setSelectedAmount(charged, calculation);
+          },
+          builder: (displayCurrency, amountPassed, currencyBar, setAmount) =>
+              SelectAmount(
           enableWalletPicker: true,
           selectedWalletPk: selectedWalletPk,
           setSelectedWalletPk: setSelectedWalletPk,
           padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
           walletPkForCurrency: selectedWalletPk,
+          currencyKey: displayCurrency, // AMEEN
+          extraWidgetAboveNumbers: currencyBar, // AMEEN
           // onlyShowCurrencyIcon:
           //     appStateSettings[
           //             "selectedWalletPk"] ==
           //         selectedWalletPk,
           onlyShowCurrencyIcon: true,
-          amountPassed: (selectedAmount ?? "0").toString(),
-          setSelectedAmount: setSelectedAmount,
+          amountPassed: amountPassed, // AMEEN
+          setSelectedAmount: setAmount, // AMEEN
           next: next ??
               () async {
                 popRoute(context);
               },
           nextLabel: nextLabel ?? "set-amount".tr(),
+        ),
         ),
       ),
     );
@@ -2016,6 +2045,35 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                 ),
               ),
             ],
+          ),
+          ForeignAmountLine( // AMEEN
+            foreign: foreignAmountOf(ameenTags),
+            charged: selectedAmount ?? 0,
+            walletCurrency: getSelectedWallet(listen: true)?.currency,
+            onEditCharged: () => openBottomSheet(
+              context,
+              fullSnap: true,
+              PopupFramework(
+                title: "amount-charged".tr(),
+                hasPadding: false,
+                underTitleSpace: false,
+                child: SelectAmount(
+                  padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+                  walletPkForCurrency: selectedWalletPk,
+                  selectedWalletPk: selectedWalletPk,
+                  currencyKey: getSelectedWallet(listen: false)?.currency,
+                  decimals: getSelectedWallet(listen: false)?.decimals,
+                  onlyShowCurrencyIcon: true,
+                  amountPassed: (selectedAmount ?? "0").toString(),
+                  setSelectedAmount: setSelectedAmount,
+                  next: () => popRoute(context),
+                  nextLabel: "set-amount".tr(),
+                ),
+              ),
+            ),
+            onRemove: () => setState(() {
+              ameenTags.remove(foreignAmountTag);
+            }),
           ),
           if (selectedCategory != null)
             SelectSubcategoryChips(
