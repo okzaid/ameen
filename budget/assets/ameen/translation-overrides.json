@@ -33,6 +33,8 @@
     "no-accounts-in-group": "No accounts in this group yet",
     "all-groups": "All groups",
     "group-view": "Group View",
-    "no-icons-found": "No icons found"
+    "no-icons-found": "No icons found",
+    "frequent-account": "Frequent Account",
+    "frequent-account-description": "Show as a quick pick when adding transactions. Other accounts stay under the show-all button."
   }
 }

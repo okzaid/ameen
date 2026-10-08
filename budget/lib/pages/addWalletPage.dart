@@ -1,3 +1,4 @@
+import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/walletIcon.dart';
 import 'package:budget/database/tables.dart';
@@ -63,6 +64,8 @@ class _AddWalletPageState extends State<AddWalletPage> {
   late Color? selectedColor =
       widget.wallet?.colour == null ? null : HexColor(widget.wallet?.colour);
   String? selectedIconName;
+  late bool selectedFrequent = // AMEEN
+      widget.wallet != null && isFrequentWallet(widget.wallet!.walletPk);
   late String? selectedGroupPk = widget.wallet == null // AMEEN
       ? widget.initialGroupPk
       : walletGroupPkOf(widget.wallet!.walletPk);
@@ -113,7 +116,8 @@ class _AddWalletPageState extends State<AddWalletPage> {
     await saveWalletGroupAfterWalletSaved( // AMEEN
         existingWalletPk: widget.wallet?.walletPk,
         insertedRowId: rowId,
-        groupPk: selectedGroupPk);
+        groupPk: selectedGroupPk,
+        frequent: selectedFrequent);
 
     if (popContext) {
       savingHapticFeedback();
@@ -504,14 +508,29 @@ class _AddWalletPageState extends State<AddWalletPage> {
             // AMEEN: account group
             child: Padding(
               padding: const EdgeInsetsDirectional.only(bottom: 15),
-              child: WalletGroupSelector(
-                selectedGroupPk: selectedGroupPk,
-                onSelected: (groupPk) {
-                  setState(() {
-                    selectedGroupPk = groupPk;
-                  });
-                  determineBottomButton();
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  WalletGroupSelector(
+                    selectedGroupPk: selectedGroupPk,
+                    onSelected: (groupPk) {
+                      setState(() {
+                        selectedGroupPk = groupPk;
+                      });
+                      determineBottomButton();
+                    },
+                  ),
+                  SizedBox(height: 5),
+                  FrequentWalletToggle(
+                    value: selectedFrequent,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedFrequent = value;
+                      });
+                      determineBottomButton();
+                    },
+                  ),
+                ],
               ),
             ),
           ),

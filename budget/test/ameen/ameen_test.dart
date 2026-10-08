@@ -1,4 +1,7 @@
 import 'package:budget/ameen/currencyOverrides.dart';
+import 'package:budget/ameen/frequentWallets.dart';
+import 'package:budget/database/tables.dart';
+import 'package:budget/struct/settings.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/ameen/translationOverrides.dart';
@@ -117,6 +120,49 @@ void main() {
           {"primary-currency": "Hauptwährung"}, "de", overrides);
       expect(de["primary-currency"], "Hauptwährung");
       expect(de.containsKey("about-us"), false);
+    });
+  });
+
+  group("Frequent accounts", () {
+    List<TransactionWallet> wallets = [
+      for (int i = 0; i < 8; i++)
+        TransactionWallet(
+          walletPk: "w$i",
+          name: "Account $i",
+          dateCreated: DateTime(2026),
+          order: i,
+          decimals: 2,
+        )
+    ];
+    List<String> pks(List<TransactionWallet> list) =>
+        list.map((w) => w.walletPk).toList();
+
+    test("shows everything without pins or with few accounts", () {
+      appStateSettings[frequentWalletsSetting] = [];
+      appStateSettings["selectedWalletPk"] = "w0";
+      expect(walletsForTransactionChips(wallets,
+              selectedWalletPk: "w0", canShowAll: true).length,
+          8);
+      appStateSettings[frequentWalletsSetting] = ["w2"];
+      expect(walletsForTransactionChips(wallets.take(5).toList(),
+              selectedWalletPk: "w0", canShowAll: true).length,
+          5);
+    });
+
+    test("shows frequent, selected and primary accounts in order", () {
+      appStateSettings[frequentWalletsSetting] = ["w5", "w2"];
+      appStateSettings["selectedWalletPk"] = "w0";
+      expect(
+          pks(walletsForTransactionChips(wallets,
+              selectedWalletPk: "w7", canShowAll: true)),
+          ["w0", "w2", "w5", "w7"]);
+    });
+
+    test("no filtering when there is no show-all button", () {
+      appStateSettings[frequentWalletsSetting] = ["w5"];
+      expect(walletsForTransactionChips(wallets,
+              selectedWalletPk: "w0", canShowAll: false).length,
+          8);
     });
   });
 }

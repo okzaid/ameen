@@ -69,3 +69,5 @@ Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/
 
 The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and run it with the path to `material_symbols_icons/lib/symbols.dart`.
 | Fonts | `pubspec.yaml`, `lib/pages/settingsPage.dart` | Nunito, Outfit, Manrope, Urbanist (`ameenExtraFonts`), OFL licences shown on the licences page |
+| Frequent accounts | `lib/pages/addTransactionPage.dart` | account chips filtered by `walletsForTransactionChips` (`lib/ameen/frequentWallets.dart`) |
+| Frequent accounts | `lib/pages/addWalletPage.dart` | "Frequent Account" switch next to the group chips |

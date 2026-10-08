@@ -1,3 +1,4 @@
+import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/selectColor.dart';
@@ -268,12 +269,15 @@ Future saveWalletGroupAfterWalletSaved({
   required String? existingWalletPk,
   required int? insertedRowId,
   required String? groupPk,
+  bool? frequent,
 }) async {
   String? walletPk = existingWalletPk;
   if (walletPk == null && insertedRowId != null) {
     walletPk = (await database.getWalletFromRowId(insertedRowId)).walletPk;
   }
   if (walletPk == null) return;
+  if (frequent != null && isFrequentWallet(walletPk) != frequent)
+    await setFrequentWallet(walletPk, frequent);
   if (walletGroupPkOf(walletPk) == groupPk) return;
   await setWalletGroup(walletPk, groupPk);
 }

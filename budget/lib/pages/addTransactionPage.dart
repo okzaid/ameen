@@ -1,3 +1,4 @@
+import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -1413,7 +1414,12 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                               ),
                             );
                           },
-                          items: Provider.of<AllWallets>(context).list,
+                          // AMEEN: frequent accounts only, the rest behind "show all"
+                          items: walletsForTransactionChips(
+                            Provider.of<AllWallets>(context).list,
+                            selectedWalletPk: selectedWalletPk,
+                            canShowAll: enableDoubleColumn(context) == false,
+                          ),
                           getSelected: (TransactionWallet wallet) {
                             return getSelectedWallet(listen: false)?.walletPk ==
                                 wallet.walletPk;
