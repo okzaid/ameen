@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/currencySheet.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/databaseGlobal.dart';
@@ -17,6 +18,14 @@ import 'package:provider/provider.dart';
 const String baseCurrencySetting = "ameenBaseCurrency";
 
 String? baseCurrencyOf(AllWallets allWallets,
+    [Map<String, dynamic>? settings]) {
+  // While viewing one currency, everything is shown in it
+  if (activeCurrencyLens != null) return activeCurrencyLens;
+  return chosenBaseCurrency(allWallets, settings);
+}
+
+// The Base Currency setting, ignoring the currency view
+String? chosenBaseCurrency(AllWallets allWallets,
     [Map<String, dynamic>? settings]) {
   Map<String, dynamic> s = settings ?? appStateSettings;
   dynamic chosen = s[baseCurrencySetting];
@@ -45,8 +54,8 @@ Future migrateBaseCurrency() async {
   if (chosen is String && chosen != "") return;
   TransactionWallet? primary;
   try {
-    primary = await database.getWalletInstance(
-        appStateSettings["selectedWalletPk"].toString());
+    primary = await database
+        .getWalletInstance(appStateSettings["selectedWalletPk"].toString());
   } catch (_) {}
   if (primary?.currency == null) return;
   await updateSettings(baseCurrencySetting, primary!.currency,

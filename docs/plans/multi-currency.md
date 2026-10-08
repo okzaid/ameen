@@ -35,7 +35,7 @@ Status: approved. Order: 1 → 3 → 4 → 2 → 5 → 6 (Option B). Option A op
 - Risk: low. Test: every converted total switches when base changes; picking
   a new primary account no longer changes totals.
 
-## Phase 2: Currency view ("lens")
+## Phase 2: Currency view ("lens") — done
 
 The key idea for "everything in each account's currency" without rewriting
 Cashew's reports.
@@ -58,6 +58,21 @@ Cashew's reports.
   neither loop over accounts nor use the shared filter, and decides per query.
 - "All" behaves like today: everything converted to base, labelled ≈.
 - Risk: medium. Needs a careful test pass of every report page with each lens.
+
+Spike result (68 transaction queries in tables.dart): 15 total loops over
+the account list, 14 use the shared filter, and the upcoming/overdue and
+loan lists use the shared search helper. With the lens in the account list
+and in both shared helpers, every report is covered (budgets' category
+limits, goals and loans through the list). The rest are lookups by id,
+sync, deletes and notification scheduling, which must not follow the view.
+Built as:
+- Home header chip "All ▾" / "₹ INR ▾" (only with 2+ currencies) opens
+  Currency View: All (converted into base) or one currency with account counts.
+- Switching remounts the app (`RestartApp`), so every page queries again.
+- Home account cards, currency breakdown and group cards follow the view;
+  the Accounts and Groups management pages keep showing every account.
+- New transactions default to an account of the viewed currency.
+- The view is remembered; a currency without accounts falls back to All.
 
 ## Phase 3: Foreign spend on an account — done
 

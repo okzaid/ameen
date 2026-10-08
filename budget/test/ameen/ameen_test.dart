@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/struct/currencyFunctions.dart';
@@ -415,6 +416,57 @@ void main() {
       expect(noteWithoutAmeenTags(note), "Transferred Balance");
       expect(ameenTagsOf(note)[transferTag], "INR 22600.00");
       expect(transferCounterpartText(all, note), startsWith("⇄ "));
+    });
+  });
+
+  group("Currency view", () {
+    TransactionWallet w(String pk, String cur) => TransactionWallet(
+        walletPk: pk, name: pk, dateCreated: DateTime(2026), order: 0,
+        decimals: 2, currency: cur);
+    List<TransactionWallet> wallets = [
+      w("adcb", "aed"), w("icici", "inr"), w("hdfc", "inr")
+    ];
+    AllWallets all = AllWallets(
+        list: wallets, indexedByPk: {for (var x in wallets) x.walletPk: x});
+    tearDown(() {
+      appStateSettings[currencyLensSetting] = "";
+      applyCurrencyLens(all);
+    });
+
+    test("All keeps every account and the chosen base", () {
+      appStateSettings[currencyLensSetting] = "";
+      appStateSettings["ameenBaseCurrency"] = "aed";
+      AllWallets shown = applyCurrencyLens(all);
+      expect(shown.list.length, 3);
+      expect(lensWalletPks, isNull);
+      expect(baseCurrencyOf(shown), "aed");
+    });
+
+    test("one currency: only its accounts, shown in it, index kept", () {
+      appStateSettings[currencyLensSetting] = "inr";
+      appStateSettings["ameenBaseCurrency"] = "aed";
+      AllWallets shown = applyCurrencyLens(all);
+      expect(shown.list.map((x) => x.walletPk), ["icici", "hdfc"]);
+      expect(shown.indexedByPk.length, 3);
+      expect(lensWalletPks, {"icici", "hdfc"});
+      expect(baseCurrencyOf(shown), "inr");
+      expect(chosenBaseCurrency(shown), "aed");
+      expect(amountRatioToPrimaryCurrency(shown, "inr"), 1);
+    });
+
+    test("new transactions default to an account of the viewed currency", () {
+      appStateSettings[currencyLensSetting] = "inr";
+      applyCurrencyLens(all);
+      expect(defaultWalletPkForLens("adcb"), "icici");
+      expect(defaultWalletPkForLens("hdfc"), "hdfc");
+    });
+
+    test("a currency with no accounts falls back to All", () {
+      appStateSettings[currencyLensSetting] = "usd";
+      AllWallets shown = applyCurrencyLens(all);
+      expect(shown.list.length, 3);
+      expect(activeCurrencyLens, isNull);
+      expect(defaultWalletPkForLens("adcb"), "adcb");
     });
   });
 }

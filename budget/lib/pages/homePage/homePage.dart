@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/accountGroupsPages.dart';
 import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/colors.dart';
@@ -278,7 +279,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   username: appStateSettings["username"] ?? "",
                                 ),
                               )
-                            : SizedBox.shrink(),
+                            : Spacer(), // AMEEN
+                        CurrencyLensButton(), // AMEEN: currency view
                         Tooltip(
                           message: "edit-home".tr(),
                           child: IconButton(

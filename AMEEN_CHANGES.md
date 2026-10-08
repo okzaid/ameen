@@ -84,3 +84,7 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Native amounts | `lib/widgets/transactionEntry/transactionEntryAmount.dart` | `NativeTransactionAmount` when "Amounts in Account Currency" is on |
 | Native amounts | `lib/pages/settingsPage.dart` | `NativeTransactionAmountsSetting` |
 | Transfers | `lib/pages/addWalletPage.dart` | `TransferBalancePopup`: keeps the typed amount, sent/received from `transferAmounts`, "<account> receives …" row with an editable received amount, ⇄ counterpart + ≈ base-rate note tags (`lib/ameen/transfers.dart`) |
+| Currency view | `lib/widgets/watchAllWallets.dart` | app-wide account list passed through `applyCurrencyLens` (only the viewed currency's accounts; index kept) (`lib/ameen/currencyLens.dart`) |
+| Currency view | `lib/database/tables.dart` | `currencyLensFilter` in `onlyShowIfFollowsSearchFilters` (null filters) and `onlyShowTransactionBasedOnSearchQuery`; `currencyLensWalletFilter` in `watchAllWalletsWithDetails` for home sections |
+| Currency view | `lib/pages/homePage/homePage.dart` | `CurrencyLensButton` next to the edit-home button (`SizedBox.shrink` → `Spacer`) |
+| Currency view | `lib/pages/addTransactionPage.dart` | default account via `defaultWalletPkForLens` |

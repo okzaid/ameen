@@ -50,6 +50,10 @@
     "native-transaction-amounts": "Amounts in Account Currency",
     "native-transaction-amounts-description": "Show each transaction in its account's currency, with the converted amount underneath",
     "amount-received": "Amount received",
-    "receives": "receives"
+    "receives": "receives",
+    "currency-view": "Currency View",
+    "currency-view-description": "Show only the accounts in one currency, with exact totals",
+    "all-currencies": "All Currencies",
+    "converted-into": "Converted into"
   }
 }

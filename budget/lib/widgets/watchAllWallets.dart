@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'dart:async';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/databaseGlobal.dart';
@@ -19,7 +20,9 @@ class WatchAllWallets extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamProvider<AllWallets>.value(
       initialData: AllWallets(list: [], indexedByPk: {}),
-      value: database.watchAllWalletsIndexed(),
+      value: database
+          .watchAllWalletsIndexed()
+          .map(applyCurrencyLens), // AMEEN: currency view
       child: child,
     );
   }

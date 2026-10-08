@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/walletIcon.dart';
@@ -39,8 +40,8 @@ class WalletGroupSummary {
   List<String> get walletPks =>
       walletsWithDetails.map((w) => w.wallet.walletPk).toList();
   List<CurrencyTotal> get totals => walletTotalsPerCurrency(walletsWithDetails);
-  int get transactionCount => walletsWithDetails.fold(
-      0, (sum, w) => sum + (w.numberTransactions ?? 0));
+  int get transactionCount =>
+      walletsWithDetails.fold(0, (sum, w) => sum + (w.numberTransactions ?? 0));
 }
 
 // Groups in their order, then "Other Accounts" when some accounts have no group
@@ -59,8 +60,8 @@ List<WalletGroupSummary> summarizeWalletGroups(
       .where((w) => walletGroupPkOf(w.wallet.walletPk) == null)
       .toList();
   if (ungrouped.isNotEmpty)
-    summaries.add(
-        WalletGroupSummary(group: null, walletsWithDetails: ungrouped));
+    summaries
+        .add(WalletGroupSummary(group: null, walletsWithDetails: ungrouped));
   return summaries;
 }
 
@@ -333,9 +334,9 @@ class WalletGroupPage extends StatefulWidget {
 class _WalletGroupPageState extends State<WalletGroupPage> {
   WalletGroup? get group => widget.groupPk == null
       ? null
-      : getWalletGroups().cast<WalletGroup?>().firstWhere(
-          (g) => g?.pk == widget.groupPk,
-          orElse: () => null);
+      : getWalletGroups()
+          .cast<WalletGroup?>()
+          .firstWhere((g) => g?.pk == widget.groupPk, orElse: () => null);
 
   @override
   Widget build(BuildContext context) {
@@ -383,8 +384,8 @@ class _WalletGroupPageState extends State<WalletGroupPage> {
             if (snapshot.hasData == false)
               return SliverToBoxAdapter(child: SizedBox.shrink());
             List<WalletWithDetails> members = snapshot.data!
-                .where((w) =>
-                    walletGroupPkOf(w.wallet.walletPk) == widget.groupPk)
+                .where(
+                    (w) => walletGroupPkOf(w.wallet.walletPk) == widget.groupPk)
                 .toList();
             List<String> walletPks =
                 members.map((w) => w.wallet.walletPk).toList();
@@ -693,8 +694,10 @@ class HomePageAccountGroups extends StatelessWidget {
           stream: database.watchAllWalletsWithDetails(),
           builder: (context, snapshot) {
             if (snapshot.hasData == false) return SizedBox.shrink();
-            List<WalletGroupSummary> summaries =
-                summarizeWalletGroups(snapshot.data!);
+            List<WalletGroupSummary> summaries = summarizeWalletGroups(snapshot
+                .data!
+                .where((w) => walletInCurrencyLens(w.wallet.walletPk))
+                .toList());
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 7),

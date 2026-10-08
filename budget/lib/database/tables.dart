@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addBudgetPage.dart';
 import 'package:budget/pages/homePage/homePageLineGraph.dart';
@@ -2411,7 +2412,11 @@ class FinanceDatabase extends _$FinanceDatabase {
     final totalSpent =
         transactions.amount.sum(filter: transactions.paid.equals(true));
     query = (select(wallets)
-          ..where((w) => ((homePageWidgetDisplay != null
+          ..where((w) => ((homePageWidgetDisplay != null ||
+                          mergeLikeCurrencies // AMEEN: home follows the view
+                      ? currencyLensWalletFilter(w)
+                      : Constant(true)) &
+              (homePageWidgetDisplay != null
                   ? w.homePageWidgetDisplay
                       .contains(homePageWidgetDisplay.index.toString())
                   : Constant(true)) &
@@ -5779,7 +5784,7 @@ class FinanceDatabase extends _$FinanceDatabase {
     required bool joinedWithBudgets,
     required bool joinedWithObjectives,
   }) {
-    if (searchFilters == null) return Constant(true);
+    if (searchFilters == null) return currencyLensFilter(tbl); // AMEEN
 
     Expression<bool> isInWalletPks =
         onlyShowBasedOnWalletFks(tbl, searchFilters.walletPks);
@@ -5966,7 +5971,8 @@ class FinanceDatabase extends _$FinanceDatabase {
     bool? withObjectives,
   }) {
     // If withCategories if true, you will need to use a join with categories!
-    return searchQuery == "" || searchQuery == null
+    return currencyLensFilter(tbl) & // AMEEN: currency view
+        (searchQuery == "" || searchQuery == null
         ? Constant(true)
         : (withCategories == true
                 ? categories.name
@@ -5996,7 +6002,7 @@ class FinanceDatabase extends _$FinanceDatabase {
             tbl.name.collate(Collate.noCase).like("%" + searchQuery + "%") |
             tbl.note.collate(Collate.noCase).like("%" + searchQuery + "%") |
             onlyShowIfSearchQueryDateIsDate(searchQuery, tbl) |
-            onlyShowIfSearchQueryAmount(searchQuery, tbl.amount);
+            onlyShowIfSearchQueryAmount(searchQuery, tbl.amount));
   }
 
   Expression<bool> onlyShowIfSearchQueryAmount(

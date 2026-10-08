@@ -1,3 +1,4 @@
+import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/baseCurrency.dart';
@@ -158,7 +159,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
   Budget? selectedBudget;
   bool selectedPaid = true;
   bool selectedBudgetIsShared = false;
-  String selectedWalletPk = appStateSettings["selectedWalletPk"];
+  String selectedWalletPk = defaultWalletPkForLens(
+      appStateSettings["selectedWalletPk"]); // AMEEN: currency view
   bool notesInputFocused = false;
   bool showMoreOptions = false;
   List<String> selectedExcludedBudgetPks = [];
