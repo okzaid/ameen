@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -258,7 +259,9 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => buildInWalletCurrency(
+      context, widget.wallet?.walletPk, ameenBuild); // AMEEN: own currency
+  Widget ameenBuild(BuildContext context) {
     // Make the information displayed follow the date range of search filters
     // Force set date time range in case its set back to null we want to override its original value
     searchFilters = searchFilters?.copyWith(

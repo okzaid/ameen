@@ -127,3 +127,13 @@ class BudgetCurrencyMode extends StatelessWidget {
     );
   }
 }
+
+// For a stateful page's build (the account page): runs [build] inside the
+// account's currency, so its totals are in it instead of the base currency
+Widget buildInWalletCurrency(BuildContext context, String? walletPk,
+    Widget Function(BuildContext context) build) {
+  String? currency =
+      walletPk == null ? null : _currencyOfWallet(context, walletPk);
+  if (currency == null) return build(context);
+  return CurrencyScope(currency: currency, child: Builder(builder: build));
+}
