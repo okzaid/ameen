@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-10-07T11:33:36.228Z",
+        "reason": "User asked the site to match the app's branding; Inter is the app's bundled font (budget/assets/fonts) and carries the Dirham glyph"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "site/style.css"
+        ],
+        "createdAt": "2026-10-07T11:33:37.253Z",
+        "reason": "Mirrors the app's account rows (EditRowEntry accent strip in the wallet colour); user asked for the same design theme as the app"
+      }
+    ]
+  }
+}
