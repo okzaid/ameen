@@ -121,6 +121,12 @@ Category-limit sheets opened from a budget still show the base currency.
 
 ## Phase 6: Locked rates in Ameen's views (Option B, toggle)
 
+Status: deferred (2026-10-08). Ameen's own converted figures are the
+transaction-row "≈ base" line and converted balances; balances should use
+today's rate, and locked rates matter for spending over time, which comes
+from Cashew's total queries (Option A). Every new transaction already
+stores its base rate (≈ tag), so this can be added later without data loss.
+
 - Setting: **Convert at the transaction's date rate** (off = today's rate everywhere).
 - Every new transaction stores its rate to base at save time (from Phase 3):
   `⁣≈AED@3.672500`. Older transactions are backfilled once from the rate
