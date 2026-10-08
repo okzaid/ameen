@@ -37,6 +37,11 @@
     "frequent-account": "Frequent Account",
     "frequent-account-description": "Show as a quick pick when adding transactions. Other accounts stay under the show-all button.",
     "location-tagging": "Location Tagging",
-    "location-tagging-description": "Save where each new transaction was added. Only the city is shown."
+    "location-tagging-description": "Save where each new transaction was added. Only the city is shown.",
+    "photo-icons": "Photo",
+    "photo-from-gallery": "Gallery",
+    "photo-from-camera": "Camera",
+    "your-photos": "Your photos",
+    "photo-icons-hint": "Use your own picture, like a bank logo or a photo of a card. It is cropped to a square and saved with the icon."
   }
 }

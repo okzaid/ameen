@@ -10,10 +10,11 @@ import 'package:flutter/material.dart';
 // Pieces added to upstream's SelectCategoryImage picker: a toggle between
 // Material Symbols and the original illustrated icons, and the Material grid.
 
-enum IconSource { material, illustrations }
+enum IconSource { material, illustrations, photo }
 
 IconSource initialIconSource(String? selectedImage) {
   String image = (selectedImage ?? "").replaceAll("assets/categories/", "");
+  if (image.startsWith("img:")) return IconSource.photo;
   // An existing illustrated icon opens on its own tab, everything else on Material
   if (image != "" && image != "image.png" && !isMaterialIcon(image))
     return IconSource.illustrations;
@@ -42,7 +43,9 @@ class IconSourceSelector extends StatelessWidget {
         onSelected: onChanged,
         getLabel: (source) => source == IconSource.material
             ? "material-icons".tr()
-            : "illustrated-icons".tr(),
+            : source == IconSource.photo
+                ? "photo-icons".tr()
+                : "illustrated-icons".tr(),
       ),
     );
   }

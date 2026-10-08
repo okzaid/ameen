@@ -268,14 +268,14 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
 
   @override
   void didChangeDependencies() {
-    if (!isMaterialIcon(widget.iconName)) // AMEEN
+    if (!isAmeenIcon(widget.iconName)) // AMEEN
       precacheImage(image.image, context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isMaterialIcon(widget.iconName)) // AMEEN
+    if (isAmeenIcon(widget.iconName)) // AMEEN
       return MaterialCategoryIcon(
           iconName: widget.iconName, size: widget.size, color: widget.color);
     return image;

@@ -10,6 +10,10 @@ import 'package:material_symbols_icons/symbols.dart';
 
 const String materialIconPrefix = "ms:";
 
+// Any icon Ameen draws itself instead of an upstream asset PNG
+bool isAmeenIcon(String? iconName) =>
+    isMaterialIcon(iconName) || (iconName?.startsWith("img:") ?? false);
+
 bool isMaterialIcon(String? iconName) =>
     iconName != null && iconName.startsWith(materialIconPrefix);
 

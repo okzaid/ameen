@@ -1,6 +1,9 @@
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/locationTagging.dart';
+import 'package:budget/ameen/photoIcons.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart' show Canvas, Paint, Rect, Color;
 import 'package:budget/ameen/settingsSync.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/settings.dart';
@@ -218,6 +221,31 @@ void main() {
       Map<String, dynamic> local = {ameenSyncedModifiedSetting: "2026-10-03T10:00:00.000Z"};
       expect(pickNewerAmeenSettings(local, {ameenSyncedModifiedSetting: "2026-10-02T10:00:00.000Z"}), null);
       expect(pickNewerAmeenSettings(local, {"ameenWalletGroups": []}), null);
+    });
+  });
+
+  group("Photo icons", () {
+    testWidgets("crops to a 128 px square and round trips", (tester) async {
+      await tester.runAsync(() async {
+        // A 300x200 red/blue test picture
+        ui.PictureRecorder recorder = ui.PictureRecorder();
+        Canvas canvas = Canvas(recorder);
+        canvas.drawRect(Rect.fromLTWH(0, 0, 150, 200), Paint()..color = Color(0xFFFF0000));
+        canvas.drawRect(Rect.fromLTWH(150, 0, 150, 200), Paint()..color = Color(0xFF0000FF));
+        ui.Image picture = await recorder.endRecording().toImage(300, 200);
+        final bytes = (await picture.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+
+        final png = await squarePhotoIconPng(bytes);
+        ui.Image result = (await (await ui.instantiateImageCodec(png!)).getNextFrame()).image;
+        expect(result.width, photoIconSize);
+        expect(result.height, photoIconSize);
+        expect(png.length, lessThan(20000));
+      });
+    });
+    test("prefix detection", () {
+      expect(isPhotoIcon("img:AAAA"), true);
+      expect(isPhotoIcon("ms:savings"), false);
+      expect(isPhotoIcon(null), false);
     });
   });
 }

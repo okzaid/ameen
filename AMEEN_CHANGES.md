@@ -75,3 +75,4 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Location | `lib/pages/addTransactionPage.dart` | fetch on open, tag added to the note on save, tag hidden while editing (`lib/ameen/locationTagging.dart`) |
 | Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview without the tag, plus "📍 City" |
 | Location | `lib/pages/settingsPage.dart`, `pubspec.yaml`, `AndroidManifest.xml`, `ios/Runner/Info.plist` | Location Tagging switch, geolocator + geocoding, location permissions |
+| Photo icons | `lib/widgets/selectCategoryImage.dart` | "Photo" tab (`lib/ameen/photoIcons.dart`); stored as `img:<base64 png>` in `iconName` |

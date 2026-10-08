@@ -1,3 +1,4 @@
+import 'package:budget/ameen/photoIcons.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/colors.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class MaterialCategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isPhotoIcon(iconName))
+      return PhotoIcon(iconName: iconName, size: size);
     return SizedBox(
       width: size,
       height: size,

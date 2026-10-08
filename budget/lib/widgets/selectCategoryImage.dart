@@ -1,3 +1,4 @@
+import 'package:budget/ameen/photoIcons.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/ameen/materialIconPicker.dart';
 import 'package:budget/functions.dart';
@@ -173,6 +174,22 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                 widget.setSelectedImage(iconName);
                 if (context.locale.toString() == "en")
                   widget.setSelectedTitle(icon.mostLikelyCategoryName);
+                setState(() {
+                  selectedImage = iconName;
+                });
+                Future.delayed(Duration(milliseconds: 70), () {
+                  popRoute(context);
+                  if (widget.next != null) {
+                    widget.next!();
+                  }
+                });
+              },
+            ),
+          if (iconSource == IconSource.photo) // AMEEN
+            PhotoIconPicker(
+              selectedImage: selectedImage,
+              onSelected: (iconName) {
+                widget.setSelectedImage(iconName);
                 setState(() {
                   selectedImage = iconName;
                 });
