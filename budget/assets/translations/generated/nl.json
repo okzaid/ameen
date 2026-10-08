@@ -472,7 +472,7 @@
   "error-getting-products": "Fout bij het krijgen van producten",
   "error-getting-products-description": "Er was een fout die verbinding maakte met de App Store. Probeer het later opnieuw.",
   "error-processing-order": "Er was een foutverwerking van uw aankoop. Probeer het opnieuw.",
-  "order-confirmation": "Bedankt voor het steunen van Ameen!",
+  "order-confirmation": "Bedankt voor het steunen van Cashew!",
   "any-previous-purchases-restored": "Eerdere aankopen zijn hersteld",
   "already-purchased": "Al gekocht",
   "current-plan": "Huidige plan",
@@ -1178,7 +1178,7 @@
   "loans-details": "Leningendetails",
   "set-details": "Details instellen",
   "import-warning": "Importwaarschuwing",
-  "import-warning-description": "Het importeren mislukt mogelijk! Zorg ervoor dat u een geldig Ameen-back-upbestand [.sqlite] of [.sql] hebt geselecteerd",
+  "import-warning-description": "Het importeren mislukt mogelijk! Zorg ervoor dat u een geldig Cashew-back-upbestand [.sqlite] of [.sql] hebt geselecteerd",
   "duplicate-budget-question": "Dubbele begroting?",
   "duplicate-budget": "Dubbele begroting"
 }

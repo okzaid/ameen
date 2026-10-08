@@ -47,6 +47,3 @@ for lang in languages:
     current_lang_index += 1
 
 print("Done!")
-
-# AMEEN: apply Ameen branding and new strings on top of the generated files
-exec(open(dir_path + "ameen-apply-overrides.py", encoding="utf-8").read())

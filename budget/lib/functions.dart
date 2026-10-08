@@ -1,3 +1,4 @@
+import 'package:budget/ameen/perCurrency.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:budget/database/tables.dart';
@@ -184,6 +185,9 @@ String convertToMoney(AllWallets allWallets, double amount,
     bool forceAbsoluteZero = true,
     NumberFormat Function(int? decimalDigits, String? locale, String? symbol)?
         getCustomNumberFormat}) {
+  // AMEEN: no currency code when the symbol alone is unambiguous (₹0, not ₹0 INR)
+  if (addCurrencyName == true && !currencyNeedsName(allWallets, currencyKey))
+    addCurrencyName = false;
   int numberDecimals = decimals ??
       allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.decimals ??
       2;

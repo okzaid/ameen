@@ -1,6 +1,6 @@
 # AMEEN: keeps Ameen up to date with upstream Cashew.
 # Weekly (and on demand) it merges jameskokoska/Cashew main into a branch,
-# re-applies Ameen's translation overrides, runs analyze + tests and opens a PR.
+# runs analyze + tests and opens a PR.
 # When the merge conflicts, the PR is opened from upstream's main so the
 # conflicts can be resolved (see AMEEN_CHANGES.md for every Ameen hook).
 name: Upstream sync
@@ -61,14 +61,6 @@ jobs:
             echo "conflicts=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Re-apply Ameen translation overrides
-        if: steps.merge.outputs.conflicts == 'false'
-        run: |
-          python3 budget/assets/translations/ameen-apply-overrides.py
-          if ! git diff --quiet; then
-            git commit -am "Re-apply Ameen translation overrides"
-          fi
-
       - uses: subosito/flutter-action@v2
         if: steps.merge.outputs.conflicts == 'false'
         with:
@@ -123,5 +115,4 @@ jobs:
           git fetch origin && git checkout main
           git merge origin/${{ steps.merge.outputs.branch }}
           # keep upstream's code, re-apply the // AMEEN lines (see AMEEN_CHANGES.md)
-          python budget/assets/translations/ameen-apply-overrides.py
           \`\`\`"

@@ -1,6 +1,7 @@
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/ameen/perCurrency.dart';
+import 'package:budget/ameen/translationOverrides.dart';
 import 'package:budget/ameen/walletIcon.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -93,6 +94,29 @@ void main() {
 
       expect(walletIconNameFrom(), null);
       expect(walletIconImage(null), null);
+    });
+  });
+
+  group("Translation overrides", () {
+    Map<String, dynamic> overrides = {
+      "*": {"shared": "Shared"},
+      "en": {"about-us": "About Us", "primary-currency": "Base Currency"},
+    };
+    test("English gets new keys and the app name", () {
+      Map<String, dynamic> en = applyAmeenTranslationOverrides(
+          {"enjoying-cashew-question": "Enjoying Cashew?", "primary-currency": "Primary Currency"},
+          "en",
+          overrides);
+      expect(en["enjoying-cashew-question"], "Enjoying Ameen?");
+      expect(en["about-us"], "About Us");
+      expect(en["primary-currency"], "Base Currency");
+      expect(en["shared"], "Shared");
+    });
+    test("Other languages keep their own translations", () {
+      Map<String, dynamic> de = applyAmeenTranslationOverrides(
+          {"primary-currency": "Hauptwährung"}, "de", overrides);
+      expect(de["primary-currency"], "Hauptwährung");
+      expect(de.containsKey("about-us"), false);
     });
   });
 }

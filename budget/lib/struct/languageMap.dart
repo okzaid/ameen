@@ -1,3 +1,4 @@
+import 'package:budget/ameen/translationOverrides.dart';
 import 'package:budget/ameen/brand.dart';
 import 'dart:convert';
 
@@ -111,7 +112,7 @@ class InitializeLocalizations extends StatelessWidget {
   Widget build(BuildContext context) {
     return EasyLocalization(
       useOnlyLangCode: false,
-      assetLoader: RootBundleAssetLoaderCustomLocaleLoader(),
+      assetLoader: AmeenTranslationLoader(), // AMEEN
       supportedLocales: supportedLocales.values.toList(),
       path: 'assets/translations/generated',
       useFallbackTranslations: true,

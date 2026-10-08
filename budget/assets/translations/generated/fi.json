@@ -472,7 +472,7 @@
   "error-getting-products": "Virhe tuotteiden saatavuudessa",
   "error-getting-products-description": "Virhe App Storeen yhdistämisessä. Yritä myöhemmin uudelleen.",
   "error-processing-order": "Virhe ostosi käsittelyssä. Yritä uudelleen.",
-  "order-confirmation": "Kiitos, että tuet Ameen'ta!",
+  "order-confirmation": "Kiitos, että tuet Cashew'ta!",
   "any-previous-purchases-restored": "Kaikki aiemmat ostot palautettiin",
   "already-purchased": "Ostettu jo",
   "current-plan": "Nykyinen tilaus",
@@ -1178,7 +1178,7 @@
   "loans-details": "Lainojen tiedot",
   "set-details": "Aseta tiedot",
   "import-warning": "Tuo varoitus",
-  "import-warning-description": "Tuonti voi epäonnistua! Varmista, että olet valinnut kelvollisen Ameen-[.sqlite]- tai [.sql]-varmuuskopiotiedoston",
+  "import-warning-description": "Tuonti voi epäonnistua! Varmista, että olet valinnut kelvollisen Cashew-[.sqlite]- tai [.sql]-varmuuskopiotiedoston",
   "duplicate-budget-question": "Päällekkäinen budjetti?",
   "duplicate-budget": "Päällekkäinen budjetti"
 }

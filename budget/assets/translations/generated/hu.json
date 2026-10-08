@@ -472,7 +472,7 @@
   "error-getting-products": "Hiba a termékek beszerzésében",
   "error-getting-products-description": "Hiba történt az alkalmazásbolthoz való csatlakozáskor. Kérjük, próbálja meg később újra.",
   "error-processing-order": "Hiba történt a vásárlás feldolgozásában. Kérjük, próbálja meg újra.",
-  "order-confirmation": "Köszönjük, hogy támogatja a Ameen-t!",
+  "order-confirmation": "Köszönjük, hogy támogatja a Cashew-t!",
   "any-previous-purchases-restored": "Minden korábbi vásárlás visszaállításra került",
   "already-purchased": "Már megvásárolt",
   "current-plan": "Aktuális terv",
@@ -1178,7 +1178,7 @@
   "loans-details": "Kölcsönök részletei",
   "set-details": "Részletek beállítása",
   "import-warning": "Importálási figyelmeztetés",
-  "import-warning-description": "Az importálás sikertelen lehet! Kérjük, győződjön meg arról, hogy egy érvényes Ameen [.sqlite] vagy [.sql] biztonsági mentési fájlt választott",
+  "import-warning-description": "Az importálás sikertelen lehet! Kérjük, győződjön meg arról, hogy egy érvényes Cashew [.sqlite] vagy [.sql] biztonsági mentési fájlt választott",
   "duplicate-budget-question": "Ismétlődő költségkeret?",
   "duplicate-budget": "Ismétlődő költségvetés"
 }

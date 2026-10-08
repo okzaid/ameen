@@ -472,7 +472,7 @@
   "error-getting-products": "Fehler beim Erhalten von Produkten",
   "error-getting-products-description": "Es gab einen Fehler bei der Verbindung mit dem App Store. Bitte versuche es später erneut.",
   "error-processing-order": "Es gab einen Fehler bei der Abwicklung Ihres Kaufes. Bitte versuche es erneut.",
-  "order-confirmation": "Vielen Dank, dass du Ameen unterstützt hast!",
+  "order-confirmation": "Vielen Dank, dass du Cashew unterstützt hast!",
   "any-previous-purchases-restored": "Alle früheren Käufe wurden wiederhergestellt",
   "already-purchased": "Bereits gekauft",
   "current-plan": "Derzeitiger Plan",
@@ -1178,7 +1178,7 @@
   "loans-details": "Kreditdetails",
   "set-details": "Details festlegen",
   "import-warning": "Import-Warnung",
-  "import-warning-description": "Der Import schlägt möglicherweise fehl! Bitte stelle sicher, dass du eine gültige Ameen-Sicherungsdatei [.sqlite] oder [.sql] ausgewählt hast",
+  "import-warning-description": "Der Import schlägt möglicherweise fehl! Bitte stelle sicher, dass du eine gültige Cashew-Sicherungsdatei [.sqlite] oder [.sql] ausgewählt hast",
   "duplicate-budget-question": "Doppeltes Budget?",
   "duplicate-budget": "Doppeltes Budget"
 }

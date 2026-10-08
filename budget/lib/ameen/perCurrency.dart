@@ -107,6 +107,8 @@ String formatTotals(AllWallets allWallets, List<CurrencyTotal> totals,
 // Code is added only when the symbol alone is ambiguous: no symbol, or
 // another of the user's account currencies uses the same symbol (USD, CAD)
 bool currencyNeedsName(AllWallets allWallets, String? currency) {
+  currency ??= allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]
+      ?.currency;
   String symbol = currenciesJSON[currency]?["Symbol"] ?? "";
   if (symbol == "") return true;
   for (String? other in allWallets.list.map((w) => w.currency).toSet()) {
