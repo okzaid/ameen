@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/settingsSync.dart';
 import 'package:budget/ameen/frequentWallets.dart';
@@ -682,6 +683,7 @@ const String accountGroupsHomeSetting = "showAmeenAccountGroups";
 // Called once at startup: existing installs get the new home section in their
 // saved home page order (disabled by default, so their home doesn't change)
 Future migrateAmeenSettings() async {
+  await migrateBaseCurrency();
   registerAmeenFontLicenses();
   warmUpLocation();
   for (String orderKey in ["homePageOrder", "homePageOrderFullScreen"]) {

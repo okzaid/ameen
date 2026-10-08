@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'dart:convert';
 import 'package:budget/database/tables.dart';
@@ -276,9 +277,7 @@ class TransactionEntry extends StatelessWidget {
         context, Theme.of(context).colorScheme.primary,
         amount: 0.3);
 
-    String? walletCurrency = Provider.of<AllWallets>(context)
-        .indexedByPk[appStateSettings["selectedWalletPk"]]
-        ?.currency;
+    String? walletCurrency = baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/;
     String? transactionCurrency = Provider.of<AllWallets>(context)
         .indexedByPk[transaction.walletFk]
         ?.currency;

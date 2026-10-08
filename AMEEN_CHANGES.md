@@ -76,3 +76,7 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview without the tag, plus "📍 City" |
 | Location | `lib/pages/settingsPage.dart`, `pubspec.yaml`, `AndroidManifest.xml`, `ios/Runner/Info.plist` | Location Tagging switch, geolocator + geocoding, location permissions |
 | Photo icons | `lib/widgets/selectCategoryImage.dart` | "Photo" tab (`lib/ameen/photoIcons.dart`); stored as `img:<base64 png>` in `iconName` |
+| Base currency | `lib/struct/currencyFunctions.dart` | `amountRatioToPrimaryCurrency` converts into `baseCurrencyOf()`; `getCurrencyString` defaults to it (`lib/ameen/baseCurrency.dart`) |
+| Base currency | `lib/functions.dart` | `convertToMoney` without a currency uses the base currency and its decimals |
+| Base currency | `homePageNetWorth.dart`, `walletDetailsPage.dart`, `transactionEntry.dart`, `addTransactionPage.dart` (2), `homePageWalletList.dart`, `exchangeRatesPage.dart` | converted totals labelled with the base currency instead of the primary account's |
+| Base currency | `lib/pages/settingsPage.dart` | `BaseCurrencySetting` replaces `PrimaryCurrencySetting` |

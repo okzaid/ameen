@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/perCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
@@ -75,9 +76,7 @@ class HomePageNetWorth extends StatelessWidget {
                                     : getColor(context, "black");
                               },
                         absolute: false,
-                        currencyKey: Provider.of<AllWallets>(context)
-                            .indexedByPk[appStateSettings["selectedWalletPk"]]
-                            ?.currency,
+                        currencyKey: baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/,
                         currencyTotalsStream: showTotalsPerCurrency() // AMEEN
                             ? watchTotalsPerCurrency(
                                 allWallets: Provider.of<AllWallets>(context),

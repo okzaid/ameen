@@ -7,8 +7,6 @@
     "based-on-app-description": "{app} is built on {upstream}, the open-source budgeting app by {author}, licensed under GPL-3.0. Tap to see the original credits, translators and acknowledgements.",
     "material-icons": "Icons",
     "illustrated-icons": "Illustrations",
-    "primary-currency": "Base Currency",
-    "select-primary-currency": "Select Base Currency",
     "totals-per-currency": "Totals per Currency",
     "totals-per-currency-description": "Show balances in each currency separately instead of converting them to your base currency",
     "rename": "Rename",
@@ -42,6 +40,8 @@
     "photo-from-gallery": "Gallery",
     "photo-from-camera": "Camera",
     "your-photos": "Your photos",
-    "photo-icons-hint": "Use your own picture, like a bank logo or a photo of a card. It is cropped to a square and saved with the icon."
+    "photo-icons-hint": "Use your own picture, like a bank logo or a photo of a card. It is cropped to a square and saved with the icon.",
+    "base-currency": "Base Currency",
+    "base-currency-description": "Totals, budgets and charts are converted into this currency"
   }
 }

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addBudgetPage.dart';
@@ -662,9 +663,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                       : getColor(context, "black");
                 },
           absolute: false,
-          currencyKey: Provider.of<AllWallets>(context)
-              .indexedByPk[appStateSettings["selectedWalletPk"]]
-              ?.currency,
+          currencyKey: baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/,
           totalWithCountStream: database.watchTotalWithCountOfWallet(
             isIncome: null,
             allWallets: Provider.of<AllWallets>(context),

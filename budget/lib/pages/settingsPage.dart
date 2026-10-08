@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/ameen/aboutUsPage.dart';
@@ -708,7 +709,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         TransactionsSettings(),
         SettingsHeader(title: "accounts".tr()),
         WalletsSettings(),
-        PrimaryCurrencySetting(),
+        BaseCurrencySetting(), // AMEEN: replaces PrimaryCurrencySetting
         SettingsHeader(title: "budgets".tr()),
         BudgetSettings(),
         SettingsHeader(title: "goals".tr()),

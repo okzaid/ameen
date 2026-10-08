@@ -1,7 +1,6 @@
 # Ameen multi-currency plan
 
-Status: proposed, waiting for approval. Locked historical rates are deferred
-(rates are still captured on every new transaction so they can be used later).
+Status: approved. Order: 1 → 3 → 4 → 2 → 5 → 6 (Option B). Option A optional.
 
 ## What Cashew already does (keep)
 
@@ -24,7 +23,7 @@ Status: proposed, waiting for approval. Locked historical rates are deferred
    tags we already use for location (backed up, synced, merge-safe).
 4. **Few, marked hooks** into upstream; logic lives in `lib/ameen/`.
 
-## Phase 1: Base Currency setting (foundation)
+## Phase 1: Base Currency setting (foundation) — done
 
 - New **Settings → Base Currency** (e.g. AED), independent of the primary
   account. The primary account stays "default account for new transactions".
@@ -96,12 +95,26 @@ Cashew's reports.
   calls (~10–15 lines across budgetContainer/budgetPage). Highest hook count.
 - Same treatment available for goals.
 
-## Phase 6 (deferred): Locked historical rates
+## Phase 6: Locked rates in Ameen's views (Option B, toggle)
 
-- Every new transaction already stores the rate to base at save time
-  (`⁣≈AED@3.672500`), starting in Phase 3.
-- Later, Ameen's own totals can use those rates; Cashew's SQL totals stay on
-  today's rate unless we decide the merge cost is worth it.
+- Setting: **Convert at the transaction's date rate** (off = today's rate everywhere).
+- Every new transaction stores its rate to base at save time (from Phase 3):
+  `⁣≈AED@3.672500`. Older transactions are backfilled once from the rate
+  service's dated endpoints (one cached request per distinct day).
+- Used by Ameen's own totals: net worth (per currency and ≈ base), group
+  totals, Accounts total, currency view "All ≈" totals, per-currency budgets.
+- Cashew's older charts (spending graph, pie chart, budget history) keep
+  today's rate and show "≈ today's rate" while the toggle is on.
+- If the base currency changes, locked values are converted once more at
+  today's cross rate.
+- No new upstream hooks.
+
+### Option A (optional, later): locked rates in every Cashew total
+
+- Per-row rate expression read from the note tag inside the ~22 total
+  queries in tables.dart, same toggle. Exact everywhere, but 2–5 small
+  conflicts per Cashew release that touches totals. Revisit after observing
+  a couple of upstream releases.
 
 ## Order, effort, risk
 
@@ -112,6 +125,7 @@ Cashew's reports.
 | 3 Foreign spend | high | M | ~4 | low |
 | 4 Real-rate transfers | medium | S–M | ~2 | low |
 | 5 Budgets per currency | high | M–L | ~12 | medium |
-| 6 Locked rates | later | L | 0–22 | low–high |
+| 6 Locked rates (Option B, toggle) | high | M | 0 | very low |
+| Option A (later) | medium | L | ~22 | medium–high |
 
 Each phase ships separately with tests, a web check and an APK.

@@ -1,4 +1,6 @@
 import 'package:budget/ameen/currencyOverrides.dart';
+import 'package:budget/ameen/baseCurrency.dart';
+import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/photoIcons.dart';
@@ -246,6 +248,52 @@ void main() {
       expect(isPhotoIcon("img:AAAA"), true);
       expect(isPhotoIcon("ms:savings"), false);
       expect(isPhotoIcon(null), false);
+    });
+  });
+
+  group("Base currency", () {
+    TransactionWallet wallet(String pk, String currency) => TransactionWallet(
+        walletPk: pk,
+        name: pk,
+        dateCreated: DateTime(2026),
+        order: 0,
+        decimals: 2,
+        currency: currency);
+    AllWallets allWallets = AllWallets(
+      list: [wallet("inr", "inr"), wallet("aed", "aed")],
+      indexedByPk: {"inr": wallet("inr", "inr"), "aed": wallet("aed", "aed")},
+    );
+    Map<String, dynamic> settings(String? base) => {
+          "selectedWalletPk": "inr",
+          baseCurrencySetting: base,
+          "customCurrencyAmounts": {},
+          // rates per 1 USD
+          "cachedCurrencyExchange": {"usd": 1, "aed": 3.6725, "inr": 84.0},
+        };
+
+    test("unset follows the primary account (upstream behaviour)", () {
+      expect(baseCurrencyOf(allWallets, settings(null)), "inr");
+      expect(
+          amountRatioToPrimaryCurrency(allWallets, "aed",
+              appStateSettingsPassed: settings(null)),
+          closeTo(84.0 / 3.6725, 1e-9));
+    });
+
+    test("set base converts into it, independent of the primary account", () {
+      expect(baseCurrencyOf(allWallets, settings("aed")), "aed");
+      expect(
+          amountRatioToPrimaryCurrency(allWallets, "inr",
+              appStateSettingsPassed: settings("aed")),
+          closeTo(3.6725 / 84.0, 1e-9));
+      expect(
+          amountRatioToPrimaryCurrency(allWallets, "aed",
+              appStateSettingsPassed: settings("aed")),
+          1);
+      // A base no account uses still converts
+      expect(
+          amountRatioToPrimaryCurrency(allWallets, "aed",
+              appStateSettingsPassed: settings("usd")),
+          closeTo(1 / 3.6725, 1e-9));
     });
   });
 }

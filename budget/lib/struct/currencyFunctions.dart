@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/struct/settings.dart';
 import 'dart:convert';
@@ -61,6 +62,15 @@ double amountRatioToPrimaryCurrency(
   if (walletCurrency == null) {
     return 1;
   }
+  // AMEEN: convert into the base currency instead of the primary account's
+  String? ameenBase = baseCurrencyOf(allWallets, appStateSettingsPassed);
+  if (ameenBase != null) {
+    if (ameenBase == walletCurrency) return 1;
+    return getCurrencyExchangeRate(ameenBase,
+            appStateSettingsPassed: appStateSettingsPassed) /
+        getCurrencyExchangeRate(walletCurrency,
+            appStateSettingsPassed: appStateSettingsPassed);
+  }
   if (allWallets
           .indexedByPk[
               (appStateSettingsPassed ?? appStateSettings)["selectedWalletPk"]]
@@ -100,6 +110,7 @@ double? amountRatioFromToCurrency(
 
 // assume selected wallets currency
 String getCurrencyString(AllWallets allWallets, {String? currencyKey}) {
+  currencyKey ??= baseCurrencyOf(allWallets); // AMEEN
   String? selectedWalletCurrency =
       allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.currency;
   return currencyKey != null

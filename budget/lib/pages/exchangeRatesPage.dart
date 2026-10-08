@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/aboutPage.dart';
@@ -225,9 +226,7 @@ class _ExchangeRatesState extends State<ExchangeRates> {
                   horizontal: 17, vertical: 5),
               child: TextFont(
                 text: "1 " +
-                    Provider.of<AllWallets>(context)
-                        .indexedByPk[appStateSettings["selectedWalletPk"]]!
-                        .currency
+                    baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/
                         .toString()
                         .allCaps,
                 maxLines: 2,

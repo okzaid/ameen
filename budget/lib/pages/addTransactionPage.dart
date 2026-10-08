@@ -1,3 +1,4 @@
+import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/database/generatePreviewData.dart';
@@ -1957,10 +1958,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                                     addCurrencyName:
                                         ((getSelectedWallet(listen: true)
                                                 ?.currency) !=
-                                            Provider.of<AllWallets>(context)
-                                                .indexedByPk[appStateSettings[
-                                                    "selectedWalletPk"]]
-                                                ?.currency),
+                                            baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/),
                                   ),
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
@@ -1974,10 +1972,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                                         appStateSettings["selectedWalletPk"] ||
                                     ((getSelectedWallet(listen: true)
                                             ?.currency) ==
-                                        Provider.of<AllWallets>(context)
-                                            .indexedByPk[appStateSettings[
-                                                "selectedWalletPk"]]
-                                            ?.currency)
+                                        baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/)
                                 ? AnimatedSizeSwitcher(
                                     switcherDuration:
                                         Duration(milliseconds: 350),
