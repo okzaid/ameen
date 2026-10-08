@@ -72,7 +72,7 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Frequent accounts | `lib/pages/addTransactionPage.dart` | account chips filtered by `walletsForTransactionChips` (`lib/ameen/frequentWallets.dart`) |
 | Frequent accounts | `lib/pages/addWalletPage.dart` | "Frequent Account" switch next to the group chips |
 | Sync | `lib/struct/syncClient.dart` | `mergeAmeenSyncedSettings()` adopts newer groups/frequent accounts from other devices (`lib/ameen/settingsSync.dart`) |
-| Note tags | `lib/pages/addTransactionPage.dart` | `ameenTags`: hidden note tags (location, foreign amount, base rate) read on open, written on save (`lib/ameen/noteTags.dart`); location fetch on open |
+| Note tags | `lib/pages/addTransactionPage.dart` | `ameenTags`: hidden note tags (location, foreign amount, transfer counterpart, base rate) read on open, written on save (`lib/ameen/noteTags.dart`); location fetch on open |
 | Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview without the tag, plus "📍 City" |
 | Location | `lib/pages/settingsPage.dart`, `pubspec.yaml`, `AndroidManifest.xml`, `ios/Runner/Info.plist` | Location Tagging switch, geolocator + geocoding, location permissions |
 | Photo icons | `lib/widgets/selectCategoryImage.dart` | "Photo" tab (`lib/ameen/photoIcons.dart`); stored as `img:<base64 png>` in `iconName` |
@@ -83,3 +83,4 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Foreign spend | `lib/pages/addTransactionPage.dart` | amount pad wrapped in `ForeignAmountPad` ("Paid in"), `ForeignAmountLine` under the amount, re-convert on account change (`lib/ameen/foreignAmount.dart`) |
 | Native amounts | `lib/widgets/transactionEntry/transactionEntryAmount.dart` | `NativeTransactionAmount` when "Amounts in Account Currency" is on |
 | Native amounts | `lib/pages/settingsPage.dart` | `NativeTransactionAmountsSetting` |
+| Transfers | `lib/pages/addWalletPage.dart` | `TransferBalancePopup`: keeps the typed amount, sent/received from `transferAmounts`, "<account> receives …" row with an editable received amount, ⇄ counterpart + ≈ base-rate note tags (`lib/ameen/transfers.dart`) |

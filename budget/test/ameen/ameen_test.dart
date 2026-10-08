@@ -4,6 +4,7 @@ import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/noteTags.dart';
+import 'package:budget/ameen/transfers.dart';
 import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/photoIcons.dart';
 import 'dart:ui' as ui;
@@ -372,6 +373,48 @@ void main() {
           {foreignAmountTag: "USD 20.0@3.672500"}, inrWallet);
       expect(charged, 1680.0);
       expect(ForeignAmount.fromPayload(tags[foreignAmountTag])!.marketRate, 84.0);
+    });
+  });
+
+  group("Real-rate transfers", () {
+    TransactionWallet w(String pk, String cur) => TransactionWallet(
+        walletPk: pk, name: pk, dateCreated: DateTime(2026), order: 0,
+        decimals: 2, currency: cur);
+    TransactionWallet adcb = w("adcb", "aed");
+    TransactionWallet icici = w("icici", "inr");
+    setUp(() {
+      appStateSettings["customCurrencyAmounts"] = {};
+      appStateSettings["cachedCurrencyExchange"] = {"usd": 1, "aed": 3.6725, "inr": 84.0};
+      appStateSettings["ameenBaseCurrency"] = "aed";
+    });
+
+    test("market amounts by default, signs like upstream", () {
+      TransferAmounts t = transferAmounts(
+          entered: 1000, enteredCurrency: "aed", from: adcb, to: icici);
+      expect(t.from, -1000);
+      expect(t.to, 22872.70);
+      TransferAmounts back = transferAmounts(
+          entered: -1000, enteredCurrency: "aed", from: adcb, to: icici);
+      expect(back.from, 1000);
+      expect(back.to, -22872.70);
+    });
+
+    test("typed received amount wins, only for the same pair", () {
+      ReceivedOverride got = ReceivedOverride("adcb", "icici", 22600);
+      expect(transferAmounts(entered: 1000, enteredCurrency: "aed",
+              from: adcb, to: icici, received: got).to, 22600);
+      expect(transferAmounts(entered: 1000, enteredCurrency: "aed",
+              from: icici, to: adcb, received: got).to, isNot(22600));
+    });
+
+    test("each side records the other side's amount", () {
+      AllWallets all = AllWallets(list: [adcb, icici],
+          indexedByPk: {"adcb": adcb, "icici": icici});
+      String note = transferNote(note: "Transferred Balance", self: adcb,
+          other: icici, otherAmount: 22600, allWallets: all);
+      expect(noteWithoutAmeenTags(note), "Transferred Balance");
+      expect(ameenTagsOf(note)[transferTag], "INR 22600.00");
+      expect(transferCounterpartText(all, note), startsWith("⇄ "));
     });
   });
 }

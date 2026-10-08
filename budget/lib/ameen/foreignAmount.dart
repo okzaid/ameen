@@ -1,3 +1,4 @@
+import 'package:budget/ameen/transfers.dart';
 import 'package:budget/ameen/currencySheet.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
@@ -368,9 +369,13 @@ class NativeTransactionAmount extends StatelessWidget {
     ForeignAmount? foreign = foreignAmountOfNote(transaction.note);
     String? base = baseCurrencyOf(allWallets);
     String? secondary;
+    String? counterpart =
+        transferCounterpartText(allWallets, transaction.note);
     if (foreign != null && foreign.currency != wallet?.currency) {
       secondary = convertToMoney(allWallets, foreign.amount,
           currencyKey: foreign.currency);
+    } else if (counterpart != null) {
+      secondary = counterpart;
     } else if (wallet?.currency != null && wallet?.currency != base) {
       secondary = "≈ " +
           convertToMoney(

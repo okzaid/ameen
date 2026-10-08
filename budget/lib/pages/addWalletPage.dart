@@ -1,3 +1,4 @@
+import 'package:budget/ameen/transfers.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/walletGroups.dart';
 import 'package:budget/ameen/walletIcon.dart';
@@ -1121,6 +1122,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
       : null;
   late DateTime? selectedDateTime = widget.initialDate ?? null;
   late String selectedTitle = widget.initialTitle ?? "";
+  ReceivedOverride? ameenReceived; // AMEEN: amount received, if typed
   late TransactionWallet? walletForCurrency =
       Provider.of<AllWallets>(context, listen: false)
                   .indexedByPk[appStateSettings["selectedWalletPk"]]
@@ -1196,6 +1198,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
 
   Future<void> transferBalance() async {
     AllWallets allWallets = Provider.of<AllWallets>(context, listen: false);
+    double ameenEntered = enteredAmount; // AMEEN
 
     // Convert the entered amount to the primary currency, then create transactions
     if (walletForCurrency != null) {
@@ -1204,6 +1207,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
               allWallets, walletForCurrency!.walletPk);
     }
 
+    enteredAmount = ameenEntered; // AMEEN: amounts come from transferAmounts
     TransactionWallet walletFrom = this.walletFrom ??
         Provider.of<AllWallets>(context, listen: false)
             .indexedByPk[appStateSettings["selectedWalletPk"]]!;
@@ -1234,6 +1238,15 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
       return;
     }
 
+    TransferAmounts ameenTransfer = transferAmounts( // AMEEN
+      entered: ameenEntered,
+      enteredCurrency: walletForCurrency?.currency ??
+          allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.currency,
+      from: walletFrom,
+      to: walletTo!,
+      received: ameenReceived,
+    );
+
     String transferString = getWalletStringName(allWallets, walletFrom) +
         (isNegative ? " ← " : " → ") +
         getWalletStringName(allWallets, walletTo);
@@ -1244,10 +1257,14 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
     DateTime selectedDateTimeSetToNow = selectedDateTime ?? DateTime.now();
 
     String? transactionPk = await createCorrectionTransaction(
-      enteredAmount *
-          getAmountRatioWalletTransferTo(allWallets, walletTo!.walletPk),
+      ameenTransfer.to, // AMEEN
       walletTo!,
-      note: note,
+      note: transferNote( // AMEEN
+          note: note,
+          self: walletTo!,
+          other: walletFrom,
+          otherAmount: ameenTransfer.from,
+          allWallets: allWallets),
       dateTime: selectedDateTimeSetToNow.add(Duration(seconds: 1)),
       title: selectedTitle == ""
           ? (allWallets.indexedByPk[walletTo!.walletPk]!.name +
@@ -1259,10 +1276,14 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
     await createCorrectionTransaction(
       objectiveLoanPk: widget.initialObjectiveLoanPk,
       pairedTransactionFk: transactionPk,
-      enteredAmount *
-          getAmountRatioWalletTransferFrom(allWallets, walletFrom.walletPk),
+      ameenTransfer.from, // AMEEN
       walletFrom,
-      note: note,
+      note: transferNote( // AMEEN
+          note: note,
+          self: walletFrom,
+          other: walletTo!,
+          otherAmount: ameenTransfer.to,
+          allWallets: allWallets),
       dateTime: selectedDateTimeSetToNow,
       title: selectedTitle == ""
           ? (allWallets.indexedByPk[walletFrom.walletPk]!.name +
@@ -1543,6 +1564,20 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
               });
             },
             allowZero: true,
+          ),
+          TransferReceivedRow( // AMEEN
+            entered: enteredAmount,
+            enteredCurrency: walletForCurrency?.currency ??
+                Provider.of<AllWallets>(context)
+                    .indexedByPk[appStateSettings["selectedWalletPk"]]
+                    ?.currency,
+            from: walletFrom ??
+                Provider.of<AllWallets>(context)
+                    .indexedByPk[appStateSettings["selectedWalletPk"]],
+            to: walletTo,
+            received: ameenReceived,
+            onReceivedChanged: (value) =>
+                setState(() => ameenReceived = value),
           ),
           Row(
             children: [

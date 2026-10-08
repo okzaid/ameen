@@ -1,21 +1,32 @@
 // Hidden data Ameen keeps at the end of a transaction's note, so it is backed
 // up and synced with the transaction without any database change.
 //
-//   "<note>\n⁣⌖25.204849,55.270782|Dubai⁣¤USD 20.00@3.672500"
+//   "<note>\n<U+2063>⌖25.204849,55.270782|Dubai<U+2063>¤USD 20.00@3.672500"
 //
 // Each tag is the invisible separator U+2063, one symbol and a payload
 // (no newlines, no U+2063). Users never see tags: notes are shown and edited
 // without them.
 
-const String tagSeparator = "⁣";
+// U+2063 INVISIBLE SEPARATOR, built from its code so the source stays readable
+final String tagSeparator = String.fromCharCode(0x2063);
 const String locationTag = "⌖";
 const String foreignAmountTag = "¤";
 const String baseRateTag = "≈";
+const String transferTag = "⇄";
 
 // Written in this order
-const List<String> knownTags = [locationTag, foreignAmountTag, baseRateTag];
+const List<String> knownTags = [
+  locationTag,
+  foreignAmountTag,
+  transferTag,
+  baseRateTag,
+];
 
-final RegExp _tagBlock = RegExp(r"\n?((?:⁣[^⁣\n]+)+)\s*$");
+final RegExp _tagBlock = RegExp(r"\n?((?:" +
+    tagSeparator +
+    "[^" +
+    tagSeparator +
+    r"\n]+)+)\s*$");
 
 Map<String, String> ameenTagsOf(String? note) {
   Map<String, String> tags = {};

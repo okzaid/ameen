@@ -48,6 +48,8 @@
     "bank-fee": "fee",
     "amount-charged": "Amount charged",
     "native-transaction-amounts": "Amounts in Account Currency",
-    "native-transaction-amounts-description": "Show each transaction in its account's currency, with the converted amount underneath"
+    "native-transaction-amounts-description": "Show each transaction in its account's currency, with the converted amount underneath",
+    "amount-received": "Amount received",
+    "receives": "receives"
   }
 }

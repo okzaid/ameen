@@ -74,7 +74,7 @@ Cashew's reports.
 - Tag system generalised: one parser for all Ameen tags (location, currency,
   rate) so notes can carry several.
 
-## Phase 4: Real-rate transfers between currencies
+## Phase 4: Real-rate transfers between currencies — done
 
 - Transfer popup: when the two accounts differ in currency, show **Sent**
   (Đ1,000 from ADCB) and **Received** (₹22,600 into ICICI), both editable,

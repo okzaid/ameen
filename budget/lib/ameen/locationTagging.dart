@@ -12,7 +12,7 @@ import 'package:geolocator/geolocator.dart';
 // and synced with the transaction and upstream's database is untouched.
 // Only the city is ever shown.
 //
-//   "<note>⁣⌖25.204849,55.270782|Dubai"
+//   "<note><U+2063>⌖25.204849,55.270782|Dubai"
 
 const String locationTaggingSetting = "ameenLocationTagging";
 final RegExp _locationPayload =
