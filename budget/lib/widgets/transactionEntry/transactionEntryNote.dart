@@ -1,3 +1,4 @@
+import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -52,7 +53,8 @@ class TransactionEntryNote extends StatelessWidget {
             showDuration: getIsFullScreen(context) == false || kIsWeb == false
                 ? Duration(milliseconds: 10000)
                 : Duration(milliseconds: 100),
-            message: cleanupNoteStringWithURLs(transaction.note),
+            message: cleanupNoteStringWithURLs(
+                notePreviewWithCity(transaction.note)), // AMEEN
             child: Padding(
               padding: padding,
               child: Icon(

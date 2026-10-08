@@ -71,3 +71,7 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Fonts | `pubspec.yaml`, `lib/pages/settingsPage.dart` | Nunito, Outfit, Manrope, Urbanist (`ameenExtraFonts`), OFL licences shown on the licences page |
 | Frequent accounts | `lib/pages/addTransactionPage.dart` | account chips filtered by `walletsForTransactionChips` (`lib/ameen/frequentWallets.dart`) |
 | Frequent accounts | `lib/pages/addWalletPage.dart` | "Frequent Account" switch next to the group chips |
+| Sync | `lib/struct/syncClient.dart` | `mergeAmeenSyncedSettings()` adopts newer groups/frequent accounts from other devices (`lib/ameen/settingsSync.dart`) |
+| Location | `lib/pages/addTransactionPage.dart` | fetch on open, tag added to the note on save, tag hidden while editing (`lib/ameen/locationTagging.dart`) |
+| Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview without the tag, plus "📍 City" |
+| Location | `lib/pages/settingsPage.dart`, `pubspec.yaml`, `AndroidManifest.xml`, `ios/Runner/Info.plist` | Location Tagging switch, geolocator + geocoding, location permissions |

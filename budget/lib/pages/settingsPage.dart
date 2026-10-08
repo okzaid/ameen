@@ -1,3 +1,4 @@
+import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/ameen/aboutUsPage.dart';
 import 'package:budget/ameen/brand.dart';
@@ -699,6 +700,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         OutlinedIconsSetting(),
         FontPickerSetting(),
         TextWeightSetting(), // AMEEN
+        LocationTaggingSetting(), // AMEEN
         AppAnimationSetting(),
         CountingNumberAnimationSetting(),
         IncreaseTextContrastSetting(),

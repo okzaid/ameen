@@ -1,3 +1,4 @@
+import 'package:budget/ameen/settingsSync.dart';
 import 'dart:async';
 import 'package:async/async.dart';
 import 'dart:convert';
@@ -466,6 +467,8 @@ Future<bool> _syncData(BuildContext context) async {
 
       List<DeleteLog> deleteLogs =
           await databaseSync.getAllNewDeleteLogs(lastSynced);
+
+      await mergeAmeenSyncedSettings(databaseSync); // AMEEN
 
       for (DeleteLog deleteLog in deleteLogs) {
         syncLogs.add(SyncLog(

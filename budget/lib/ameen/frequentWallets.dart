@@ -1,3 +1,4 @@
+import 'package:budget/ameen/settingsSync.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/settingsContainers.dart';
@@ -25,6 +26,7 @@ Future setFrequentWallet(String walletPk, bool frequent) async {
   List<String> pks = getFrequentWalletPks()..remove(walletPk);
   if (frequent) pks.add(walletPk);
   await updateSettings(frequentWalletsSetting, pks, updateGlobalState: false);
+  await touchAmeenSyncedSettings();
 }
 
 // Accounts to show as chips on the add transaction page

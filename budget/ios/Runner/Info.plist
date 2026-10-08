@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ameen saves where you add a transaction so you can see the city later. You can turn this off in Settings.</string>
   <key>UISupportsDocumentBrowser</key>
   <false/>
   <key>LSSupportsOpeningDocumentsInPlace</key>

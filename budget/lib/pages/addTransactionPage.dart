@@ -1,3 +1,4 @@
+import 'package:budget/ameen/locationTagging.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
@@ -468,6 +469,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         await addAssociatedTitles(selectedTitle!, selectedCategory!);
       }
 
+      if (widget.transaction == null) // AMEEN: location tagging
+        ameenLocation = await locationForNewTransaction();
       Transaction createdTransaction = await createTransaction();
 
       if (widget.transaction != null) {
@@ -657,7 +660,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       amount: (selectedIncome || selectedAmount == 0 //Prevent negative 0
           ? (selectedAmount ?? 0).abs()
           : (selectedAmount ?? 0).abs() * -1),
-      note: _noteInputController.text,
+      note: noteWithLocation(_noteInputController.text, ameenLocation), // AMEEN
       categoryFk: selectedCategory?.categoryPk ?? "-1",
       subCategoryFk: selectedSubCategory?.categoryPk,
       dateCreated: selectedDate,
@@ -723,17 +726,23 @@ class _AddTransactionPageState extends State<AddTransactionPage>
 
   late TextEditingController _titleInputController;
   late TextEditingController _noteInputController;
+  TransactionLocation? ameenLocation; // AMEEN
 
   @override
   void initState() {
     super.initState();
+    if (widget.transaction == null) // AMEEN
+      refreshLocationInBackground();
+    else
+      ameenLocation = locationOfNote(widget.transaction!.note);
     if (widget.transaction != null) {
       //We are editing a transaction
       //Fill in the information from the passed in transaction
       _titleInputController =
           new TextEditingController(text: widget.transaction!.name);
       _noteInputController =
-          new LinkHighlighter(initialText: widget.transaction!.note);
+          new LinkHighlighter(
+              initialText: noteWithoutLocation(widget.transaction!.note)); // AMEEN
       selectedTitle = widget.transaction!.name;
       selectedDate = widget.transaction!.dateCreated;
       selectedEndDate = widget.transaction!.endDate;

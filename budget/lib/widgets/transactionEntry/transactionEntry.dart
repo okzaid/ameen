@@ -1,3 +1,4 @@
+import 'package:budget/ameen/locationTagging.dart';
 import 'dart:convert';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -415,7 +416,8 @@ class TransactionEntry extends StatelessWidget {
           ),
           Expanded(
             child: TextFont(
-              text: transaction.note.replaceAll("\n", ", "),
+              text: notePreviewWithCity(transaction.note) // AMEEN
+                  .replaceAll("\n", ", "),
               fontSize: fontSize - 4,
               maxLines: 2,
               textColor: getColor(context, "textLight").withOpacity(0.7),

@@ -1,3 +1,5 @@
+import 'package:budget/ameen/locationTagging.dart';
+import 'package:budget/ameen/settingsSync.dart';
 import 'package:budget/ameen/frequentWallets.dart';
 import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/widgets/textInput.dart';
@@ -104,6 +106,7 @@ Future _saveWalletGroups(List<WalletGroup> groups) async {
     [for (WalletGroup group in groups) group.toJson()],
     updateGlobalState: false,
   );
+  await touchAmeenSyncedSettings();
   homePageStateKey.currentState?.refreshState();
 }
 
@@ -219,6 +222,7 @@ class _WalletGroupEditorState extends State<_WalletGroupEditor> {
 Future _saveWalletGroupOf(Map<String, String> groupOf) async {
   await updateSettings(walletGroupOfSetting, groupOf,
       updateGlobalState: false);
+  await touchAmeenSyncedSettings();
 }
 
 Future<WalletGroup> createWalletGroup(String name) async {
@@ -679,6 +683,7 @@ const String accountGroupsHomeSetting = "showAmeenAccountGroups";
 // saved home page order (disabled by default, so their home doesn't change)
 Future migrateAmeenSettings() async {
   registerAmeenFontLicenses();
+  warmUpLocation();
   for (String orderKey in ["homePageOrder", "homePageOrderFullScreen"]) {
     List<dynamic>? order = appStateSettings[orderKey];
     if (order == null || order.contains(accountGroupsHomeSection)) continue;

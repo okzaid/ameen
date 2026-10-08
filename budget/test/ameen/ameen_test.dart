@@ -1,5 +1,7 @@
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/frequentWallets.dart';
+import 'package:budget/ameen/locationTagging.dart';
+import 'package:budget/ameen/settingsSync.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
@@ -163,6 +165,59 @@ void main() {
       expect(walletsForTransactionChips(wallets,
               selectedWalletPk: "w0", canShowAll: false).length,
           8);
+    });
+  });
+
+  group("Location tag", () {
+    TransactionLocation dubai = TransactionLocation(25.2048493, 55.2707828, "Dubai");
+    test("round trips and stays out of the visible note", () {
+      String note = noteWithLocation("Lunch with team", dubai);
+      expect(noteWithoutLocation(note), "Lunch with team");
+      TransactionLocation? parsed = locationOfNote(note);
+      expect(parsed!.latitude, closeTo(25.204849, 0.000001));
+      expect(parsed.longitude, closeTo(55.270783, 0.000001));
+      expect(parsed.city, "Dubai");
+      expect(notePreviewWithCity(note), "Lunch with team  ·  📍 Dubai");
+    });
+    test("empty note and no city", () {
+      String note = noteWithLocation("", TransactionLocation(-33.86, 151.2, null));
+      expect(noteWithoutLocation(note), "");
+      expect(locationOfNote(note)!.city, null);
+      expect(notePreviewWithCity(note), "");
+    });
+    test("re-saving replaces the tag instead of adding another", () {
+      String once = noteWithLocation("Taxi", dubai);
+      String twice = noteWithLocation(once, dubai);
+      expect(twice, once);
+      expect(noteWithLocation(once, null), "Taxi");
+    });
+    test("plain notes are untouched", () {
+      expect(locationOfNote("Paid 25,50 at 10:30"), null);
+      expect(noteWithoutLocation("Line one\nLine two"), "Line one\nLine two");
+    });
+  });
+
+  group("Settings sync", () {
+    test("adopts newer Ameen settings from another device", () {
+      Map<String, dynamic> local = {
+        ameenSyncedModifiedSetting: "2026-10-01T10:00:00.000Z",
+        "ameenWalletGroups": [],
+      };
+      Map<String, dynamic> remote = {
+        ameenSyncedModifiedSetting: "2026-10-02T10:00:00.000Z",
+        "ameenWalletGroups": [{"pk": "g1", "name": "Banks"}],
+        "ameenFrequentWallets": ["w1"],
+        "font": "Avenir",
+      };
+      Map<String, dynamic>? newer = pickNewerAmeenSettings(local, remote);
+      expect(newer!["ameenWalletGroups"], remote["ameenWalletGroups"]);
+      expect(newer["ameenFrequentWallets"], ["w1"]);
+      expect(newer.containsKey("font"), false);
+    });
+    test("keeps local settings when they are newer or the device never set any", () {
+      Map<String, dynamic> local = {ameenSyncedModifiedSetting: "2026-10-03T10:00:00.000Z"};
+      expect(pickNewerAmeenSettings(local, {ameenSyncedModifiedSetting: "2026-10-02T10:00:00.000Z"}), null);
+      expect(pickNewerAmeenSettings(local, {"ameenWalletGroups": []}), null);
     });
   });
 }
