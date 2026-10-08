@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addObjectivePage.dart';
@@ -50,9 +51,12 @@ class ObjectivePage extends StatelessWidget {
             Color? accentColor = HexColor(snapshot.data?.colour);
             return CustomColorTheme(
               accentColor: snapshot.data?.colour == null ? null : accentColor,
-              child: _ObjectivePageContent(
-                objective: snapshot.data!,
-              ),
+              child: walletCurrencyScope( // AMEEN: own currency
+                context,
+                snapshot.data!.walletFk,
+                _ObjectivePageContent(
+                  objective: snapshot.data!,
+              )),
             );
           }
           return SizedBox.shrink();

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/currencyOverrides.dart';
 import 'package:budget/ameen/baseCurrency.dart';
@@ -467,6 +468,42 @@ void main() {
       expect(shown.list.length, 3);
       expect(activeCurrencyLens, isNull);
       expect(defaultWalletPkForLens("adcb"), "adcb");
+    });
+  });
+
+  group("Budgets and goals in their own currency", () {
+    TransactionWallet w(String pk, String cur) => TransactionWallet(
+        walletPk: pk, name: pk, dateCreated: DateTime(2026), order: 0,
+        decimals: 2, currency: cur);
+    List<TransactionWallet> wallets = [
+      w("adcb", "aed"), w("icici", "inr"), w("hdfc", "inr")
+    ];
+    AllWallets all = AllWallets(
+        list: wallets, indexedByPk: {for (var x in wallets) x.walletPk: x});
+    setUp(() {
+      appStateSettings[currencyLensSetting] = "";
+      applyCurrencyLens(all);
+      appStateSettings["customCurrencyAmounts"] = {};
+      appStateSettings["cachedCurrencyExchange"] = {"usd": 1, "aed": 3.6725, "inr": 84.0};
+      appStateSettings["ameenBaseCurrency"] = "aed";
+    });
+
+    test("inside a scope totals convert into the budget's currency", () {
+      ScopedWallets scoped = ScopedWallets(all, "inr");
+      expect(baseCurrencyOf(scoped), "inr");
+      expect(amountRatioToPrimaryCurrency(scoped, "inr"), 1);
+      expect(amountRatioToPrimaryCurrency(scoped, "aed"), closeTo(84 / 3.6725, 1e-9));
+      // Converted into base and back is exact for the budget's own currency
+      double viaBase = 1234.5 * amountRatioToPrimaryCurrency(all, "inr");
+      expect(viaBase * amountRatioToPrimaryCurrency(scoped, "aed"), closeTo(1234.5, 1e-9));
+    });
+
+    test("only-currency accounts are detected in any order", () {
+      expect(walletPksOfCurrency(all, "inr"), ["icici", "hdfc"]);
+      expect(isOnlyCurrencyAccounts(all, "inr", ["hdfc", "icici"]), true);
+      expect(isOnlyCurrencyAccounts(all, "inr", ["icici"]), false);
+      expect(isOnlyCurrencyAccounts(all, "inr", null), false);
+      expect(isOnlyCurrencyAccounts(all, "inr", ["icici", "hdfc", "adcb"]), false);
     });
   });
 }

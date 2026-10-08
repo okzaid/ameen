@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
@@ -1178,7 +1179,18 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                             widget.budget!.addedTransactionsOnly == false) ||
                         widget.budget == null),
             sliver: SliverToBoxAdapter(
-                child: WalletChipSelector(
+                child: Column(children: [
+              BudgetCurrencyMode( // AMEEN
+                walletPk: selectedWalletPk,
+                walletFks: selectedWalletFks,
+                onChanged: (selected) {
+                  selectedWalletFks = selected;
+                  setState(() {});
+                  determineBottomButton();
+                },
+              ),
+              WalletChipSelector(
+              key: ValueKey(budgetCurrencyModeVersion), // AMEEN
               expand:
                   !(selectedShared == true || selectedAddedTransactionsOnly),
               onSelected: (selected) {
@@ -1187,7 +1199,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                 determineBottomButton();
               },
               initiallySelectedWalletFks: selectedWalletFks,
-            )),
+            )])),
           ),
           SliverStickyLabelDivider(
             info: "select-categories".tr(),

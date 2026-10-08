@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'dart:math';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -65,12 +66,15 @@ class BudgetPage extends StatelessWidget {
             Color? accentColor = HexColor(snapshot.data?.colour);
             return CustomColorTheme(
               accentColor: snapshot.data?.colour == null ? null : accentColor,
-              child: _BudgetPageContent(
-                budget: snapshot.data!,
+              child: walletCurrencyScope( // AMEEN: own currency
+                context,
+                snapshot.data!.walletFk,
+                _BudgetPageContent(
+                  budget: snapshot.data!,
                 dateForRange: dateForRange,
                 dateForRangeIndex: dateForRangeIndex,
                 openedFromHistory: openedFromHistory,
-              ),
+              )),
             );
           }
           return SizedBox.shrink();

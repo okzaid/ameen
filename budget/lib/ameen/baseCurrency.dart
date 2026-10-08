@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/currencySheet.dart';
 import 'package:budget/database/tables.dart';
@@ -19,6 +20,8 @@ const String baseCurrencySetting = "ameenBaseCurrency";
 
 String? baseCurrencyOf(AllWallets allWallets,
     [Map<String, dynamic>? settings]) {
+  // Budget and goal screens use the budget's or goal's currency
+  if (allWallets is ScopedWallets) return allWallets.currency;
   // While viewing one currency, everything is shown in it
   if (activeCurrencyLens != null) return activeCurrencyLens;
   return chosenBaseCurrency(allWallets, settings);

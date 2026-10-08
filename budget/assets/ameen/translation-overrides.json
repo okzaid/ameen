@@ -54,6 +54,8 @@
     "currency-view": "Currency View",
     "currency-view-description": "Show only the accounts in one currency, with exact totals",
     "all-currencies": "All Currencies",
-    "converted-into": "Converted into"
+    "converted-into": "Converted into",
+    "only-currency-accounts": "Only {currency} accounts",
+    "all-currencies-converted": "All currencies (≈)"
   }
 }

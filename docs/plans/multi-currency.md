@@ -97,7 +97,7 @@ Built as:
 - Both transactions get a tag with the counterpart amount and rate.
 - Hook: Cashew's TransferBalancePopup (addWalletPage.dart), ~2 places.
 
-## Phase 5: Budgets per currency
+## Phase 5: Budgets per currency — done
 
 - A budget's currency = its account (already in Cashew). Budget editor gets a
   clear **Currency** picker (sets the budget's account to one of that
@@ -109,6 +109,15 @@ Built as:
   limits, objectives) and the currency passed to their `convertToMoney`
   calls (~10–15 lines across budgetContainer/budgetPage). Highest hook count.
 - Same treatment available for goals.
+
+Built as: budget and goal cards and pages render inside a currency scope
+(`ScopedWallets`, read by `baseCurrencyOf`), so every total, limit and
+amount there is converted into and shown in the budget's/goal's currency
+(its account's, picked on its amount pad as in Cashew) instead of the base
+currency: 6 one/two-line hooks instead of ~30 call sites. The editor's
+"Select Accounts" gets **Only ₹ accounts** (exact: the account filter becomes
+every account of the budget's currency) and **All currencies (≈)**.
+Category-limit sheets opened from a budget still show the base currency.
 
 ## Phase 6: Locked rates in Ameen's views (Option B, toggle)
 

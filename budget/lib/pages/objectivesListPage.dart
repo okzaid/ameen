@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -391,6 +392,8 @@ class ObjectiveContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? ameenScoped = scopeToWalletCurrency(context, objective.walletFk, this);
+    if (ameenScoped != null) return ameenScoped; // AMEEN: own currency
     double borderRadius =
         getPlatform() == PlatformOS.isIOS && forceAndroidBubbleDesign == false
             ? 0
@@ -757,6 +760,8 @@ class ObjectiveContainerDifferenceLoan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? ameenScoped = scopeToWalletCurrency(context, objective.walletFk, this);
+    if (ameenScoped != null) return ameenScoped; // AMEEN: own currency
     double borderRadius = rowEntry ||
             (getPlatform() == PlatformOS.isIOS &&
                 forceAndroidBubbleDesign == false)

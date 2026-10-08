@@ -1,3 +1,4 @@
+import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/sharedBudgetSettings.dart';
 import 'package:budget/pages/transactionFilters.dart';
@@ -47,6 +48,8 @@ class BudgetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? ameenScoped = scopeToWalletCurrency(context, budget.walletFk, this);
+    if (ameenScoped != null) return ameenScoped; // AMEEN: own currency
     double budgetAmount = budgetAmountToPrimaryCurrency(
         Provider.of<AllWallets>(context, listen: true), budget);
     DateTime dateForRangeLocal =
