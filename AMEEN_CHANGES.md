@@ -70,3 +70,4 @@ Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/
 | Icon picker | `lib/pages/addCategoryPage.dart`, `addObjectivePage.dart`, `objectivePage.dart` | pass the selected colour to the picker |
 
 The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and run it with the path to `material_symbols_icons/lib/symbols.dart`.
+| Fonts | `pubspec.yaml`, `lib/pages/settingsPage.dart` | Nunito, Outfit, Manrope, Urbanist (`ameenExtraFonts`), OFL licences shown on the licences page |

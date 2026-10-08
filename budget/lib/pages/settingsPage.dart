@@ -1114,6 +1114,7 @@ void openFontPicker(BuildContext context) {
           "Avenir",
           "DMSans",
           "Metropolis",
+          ...ameenExtraFonts, // AMEEN
           // SF Pro removed - users on iOS can just select Platform font
           // Inter is the font family fallback
           "RobotoCondensed",

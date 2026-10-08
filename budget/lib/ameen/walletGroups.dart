@@ -1,3 +1,4 @@
+import 'package:budget/ameen/textWeight.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/selectColor.dart';
 import 'package:budget/widgets/button.dart';
@@ -673,6 +674,7 @@ const String accountGroupsHomeSetting = "showAmeenAccountGroups";
 // Called once at startup: existing installs get the new home section in their
 // saved home page order (disabled by default, so their home doesn't change)
 Future migrateAmeenSettings() async {
+  registerAmeenFontLicenses();
   for (String orderKey in ["homePageOrder", "homePageOrderFullScreen"]) {
     List<dynamic>? order = appStateSettings[orderKey];
     if (order == null || order.contains(accountGroupsHomeSection)) continue;

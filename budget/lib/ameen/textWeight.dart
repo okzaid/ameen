@@ -1,7 +1,9 @@
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/settingsContainers.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Global text weight: upstream asks for FontWeight.bold almost everywhere.
 // Instead of changing every call, upstream's TextFont maps the requested
@@ -48,4 +50,17 @@ class TextWeightSetting extends StatelessWidget {
       },
     );
   }
+}
+
+// Extra fonts in the font picker (pubspec family names, OFL licensed)
+const List<String> ameenExtraFonts = ["Nunito", "Outfit", "Manrope", "Urbanist"];
+
+// Shows the fonts' OFL licences on the app's licences page
+void registerAmeenFontLicenses() {
+  LicenseRegistry.addLicense(() async* {
+    for (String font in ameenExtraFonts) {
+      String text = await rootBundle.loadString("assets/fonts/OFL-$font.txt");
+      yield LicenseEntryWithLineBreaks([font], text);
+    }
+  });
 }

@@ -613,9 +613,8 @@ class _GroupAccountRow extends StatelessWidget {
                       walletWithDetails.totalSpent ?? 0,
                       currencyKey: wallet.currency,
                       decimals: wallet.decimals,
-                      addCurrencyName: Provider.of<AllWallets>(context)
-                              .allContainSameCurrency() ==
-                          false,
+                      addCurrencyName: currencyNeedsName(
+                          Provider.of<AllWallets>(context), wallet.currency),
                     ),
                     fontSize: 17,
                     fontWeight: FontWeight.bold,

@@ -94,7 +94,7 @@ String formatTotals(AllWallets allWallets, List<CurrencyTotal> totals,
   if ((perCurrency ?? showTotalsPerCurrency()) == false || totals.length == 1) {
     if (totals.length == 1)
       return formatCurrencyTotal(allWallets, totals.first,
-          addCurrencyName: allWallets.allContainSameCurrency() == false);
+          addCurrencyName: currencyNeedsName(allWallets, totals.first.currency));
     return convertToMoney(allWallets, convertedTotal(allWallets, totals));
   }
   bool addCurrencyName = needsCurrencyName(totals);
@@ -102,6 +102,18 @@ String formatTotals(AllWallets allWallets, List<CurrencyTotal> totals,
       .map((total) => formatCurrencyTotal(allWallets, total,
           addCurrencyName: addCurrencyName))
       .join(separator);
+}
+
+// Code is added only when the symbol alone is ambiguous: no symbol, or
+// another of the user's account currencies uses the same symbol (USD, CAD)
+bool currencyNeedsName(AllWallets allWallets, String? currency) {
+  String symbol = currenciesJSON[currency]?["Symbol"] ?? "";
+  if (symbol == "") return true;
+  for (String? other in allWallets.list.map((w) => w.currency).toSet()) {
+    if (other != currency && (currenciesJSON[other]?["Symbol"] ?? "") == symbol)
+      return true;
+  }
+  return false;
 }
 
 // Currency codes are added when two currencies share a symbol (e.g. USD, CAD)
