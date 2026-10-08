@@ -592,6 +592,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                       PopupFramework(
                         title: "select-icon".tr(),
                         child: SelectCategoryImage(
+                          color: selectedColor, // AMEEN
                           setSelectedImage: setSelectedImage,
                           setSelectedEmoji: setSelectedEmoji,
                           selectedImage:

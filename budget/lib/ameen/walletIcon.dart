@@ -103,6 +103,7 @@ class WalletIconPicker extends StatelessWidget {
           PopupFramework(
             title: "select-icon".tr(),
             child: SelectCategoryImage(
+              color: color,
               selectedImage: image == null ? null : "assets/categories/" + image,
               setSelectedImage: (String? selected) {
                 onChanged(walletIconNameFrom(

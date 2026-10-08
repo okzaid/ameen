@@ -1210,5 +1210,6 @@
   "delete-account-group": "Delete Group",
   "no-accounts-in-group": "No accounts in this group yet",
   "all-groups": "All groups",
-  "group-view": "Group View"
+  "group-view": "Group View",
+  "no-icons-found": "No icons found"
 }

@@ -1,6 +1,9 @@
+import 'package:budget/ameen/materialCategoryIcon.dart';
 import 'package:budget/ameen/materialIconCatalog.dart';
 import 'package:budget/widgets/selectChips.dart';
+import 'package:budget/colors.dart';
 import 'package:budget/widgets/tappable.dart';
+import 'package:budget/widgets/textWidgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -50,15 +53,16 @@ class MaterialIconGrid extends StatelessWidget {
     required this.searchTerm,
     required this.selectedImage,
     required this.onSelected,
+    this.color,
     super.key,
   });
   final String searchTerm;
   final String? selectedImage;
   final Function(MaterialIconForCategory) onSelected;
+  // Colour of the category/account being edited, previewed on every icon
+  final Color? color;
 
-  @override
-  Widget build(BuildContext context) {
-    List<MaterialIconForCategory> icons = searchMaterialIcons(searchTerm);
+  Widget _wrap(List<MaterialIconForCategory> icons) {
     return Center(
       child: Wrap(
         alignment: WrapAlignment.center,
@@ -66,11 +70,50 @@ class MaterialIconGrid extends StatelessWidget {
           for (MaterialIconForCategory icon in icons)
             MaterialIconOption(
               icon: icon.icon,
+              color: color,
               selected: selectedImage == materialIconNameToStore(icon.name),
               onTap: () => onSelected(icon),
             ),
         ],
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (searchTerm.trim() != "") {
+      List<MaterialIconForCategory> results = searchMaterialIcons(searchTerm);
+      if (results.isEmpty)
+        return Padding(
+          padding: const EdgeInsetsDirectional.all(20),
+          child: TextFont(
+            text: "no-icons-found".tr(),
+            textColor: getColor(context, "textLight"),
+          ),
+        );
+      return _wrap(results);
+    }
+    // Browsing: one heading per section
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (MaterialIconSection section in materialIconSections) ...[
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+                start: 10, end: 10, top: 14, bottom: 4),
+            child: TextFont(
+              text: ("icon-section-" + section.key).tr() ==
+                      "icon-section-" + section.key
+                  ? section.title
+                  : ("icon-section-" + section.key).tr(),
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              textColor: getColor(context, "textLight"),
+            ),
+          ),
+          _wrap(section.icons),
+        ],
+      ],
     );
   }
 }
@@ -81,16 +124,19 @@ class MaterialIconOption extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.onTap,
+    this.color,
     this.size = 55,
     super.key,
   });
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
+  final Color? color;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    Color? previewColor = color;
     return AnimatedContainer(
       duration: Duration(milliseconds: 250),
       margin: EdgeInsetsDirectional.all(5),
@@ -99,14 +145,19 @@ class MaterialIconOption extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(
           color: selected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+              ? (previewColor ?? Theme.of(context).colorScheme.primary)
+                  .withOpacity(0.8)
               : Colors.transparent,
           width: selected ? 2 : 0,
         ),
         borderRadius: BorderRadiusDirectional.all(Radius.circular(500)),
       ),
       child: Tappable(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        // Same tinted background CategoryIcon draws for this colour
+        color: previewColor == null
+            ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5)
+            : dynamicPastel(context, previewColor,
+                amountLight: 0.55, amountDark: 0.35),
         onTap: onTap,
         borderRadius: 500,
         child: Center(
@@ -114,7 +165,9 @@ class MaterialIconOption extends StatelessWidget {
             icon,
             size: size * 0.52,
             fill: 1,
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
+            color: previewColor == null
+                ? Theme.of(context).colorScheme.onSecondaryContainer
+                : materialIconForeground(context, previewColor),
           ),
         ),
       ),

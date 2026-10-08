@@ -66,3 +66,7 @@ Ameen-only CI: `.github/workflows/ci.yml` (analyze + `test/ameen`) and `.github/
 | Group view | `lib/main.dart` | `migrateAmeenSettings()` adds the section to saved home layouts |
 | Group view | `lib/pages/editWalletsPage.dart` | ⋮ "Group View" |
 | Group view | `lib/pages/addWalletPage.dart` | `initialGroupPk` (Add Account from a group) |
+| Icon picker | `lib/widgets/selectCategoryImage.dart` | optional `color` passed to the Material grid |
+| Icon picker | `lib/pages/addCategoryPage.dart`, `addObjectivePage.dart`, `objectivePage.dart` | pass the selected colour to the picker |
+
+The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and run it with the path to `material_symbols_icons/lib/symbols.dart`.

@@ -38,6 +38,7 @@ class SelectCategoryImage extends StatefulWidget {
     required this.setSelectedTitle,
     required this.setSelectedEmoji,
     this.next,
+    this.color, // AMEEN: preview colour for Material icons
   }) : super(key: key);
 
   final Function(String?) setSelectedImage;
@@ -45,6 +46,7 @@ class SelectCategoryImage extends StatefulWidget {
   final Function(String?) setSelectedTitle;
   final Function(String?) setSelectedEmoji;
   final VoidCallback? next;
+  final Color? color; // AMEEN
 
   @override
   _SelectCategoryImageState createState() => _SelectCategoryImageState();
@@ -163,6 +165,7 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
           SizedBox(height: 5),
           if (iconSource == IconSource.material) // AMEEN
             MaterialIconGrid(
+              color: widget.color,
               searchTerm: searchTerm,
               selectedImage: selectedImage,
               onSelected: (icon) {

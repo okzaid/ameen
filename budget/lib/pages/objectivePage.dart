@@ -116,6 +116,9 @@ class _ObjectivePageContentState extends State<_ObjectivePageContent> {
       PopupFramework(
         title: "select-icon".tr(),
         child: SelectCategoryImage(
+          color: widget.objective.colour == null // AMEEN
+              ? null
+              : HexColor(widget.objective.colour),
           setSelectedImage: (String? selection) async {
             String? selectedIcon =
                 (selection ?? "").replaceFirst("assets/categories/", "");
