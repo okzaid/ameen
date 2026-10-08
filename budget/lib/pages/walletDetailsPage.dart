@@ -1,3 +1,5 @@
+import 'package:budget/ameen/perCurrency.dart';
+import 'package:budget/ameen/spendingCurrency.dart';
 import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/database/tables.dart';
@@ -131,6 +133,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
       : widget.wallet!.walletPk.toString() + " Wallet Summary";
   GlobalKey<PageFrameworkState> pageState = GlobalKey();
   SearchFilters? searchFilters;
+  String? ameenPageCurrency; // AMEEN: spending page currency, this visit only
   late ScrollController _scrollController = ScrollController();
   late TabController _tabController = TabController(
     length: widget.wallet == null ? 2 : 1,
@@ -259,8 +262,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
   }
 
   @override
-  Widget build(BuildContext context) => buildInWalletCurrency(
-      context, widget.wallet?.walletPk, ameenBuild); // AMEEN: own currency
+  Widget build(BuildContext context) => buildInCurrency(context,
+      widget.wallet?.currency ?? ameenPageCurrency, ameenBuild); // AMEEN
   Widget ameenBuild(BuildContext context) {
     // Make the information displayed follow the date range of search filters
     // Force set date time range in case its set back to null we want to override its original value
@@ -271,8 +274,9 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
       forceSetDateTimeRange: true,
     );
 
-    List<String>? walletPks =
-        widget.wallet == null ? null : [widget.wallet?.walletPk ?? ""];
+    List<String>? walletPks = widget.wallet == null
+        ? walletPksForPageCurrency(ameenPageCurrency) // AMEEN
+        : [widget.wallet?.walletPk ?? ""];
 
     // if (widget.wallet == null &&
     //     appStateSettings["allSpendingAllWallets"] == false) {
@@ -613,8 +617,11 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
       ),
     );
 
-    Widget appliedFilterChipsWidget =
-        searchFilters != null && widget.wallet == null
+    Widget appliedFilterChipsWidget = withSpendingCurrencyChips( // AMEEN
+        enabled: widget.wallet == null,
+        selected: ameenPageCurrency,
+        onSelected: (currency) => setState(() => ameenPageCurrency = currency),
+        child: searchFilters != null && widget.wallet == null
             ? Padding(
                 padding: EdgeInsetsDirectional.symmetric(
                   horizontal: getHorizontalPaddingConstrained(
@@ -632,7 +639,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                   clearSearchFilters: clearSearchFilters,
                 ),
               )
-            : SizedBox.shrink();
+            : SizedBox.shrink()); // AMEEN
 
     Widget totalNetContainer = Padding(
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
@@ -667,6 +674,18 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                 },
           absolute: false,
           currencyKey: baseCurrencyOf(Provider.of<AllWallets>(context)) /*AMEEN*/,
+          currencyTotalsStream: widget.wallet != null // AMEEN
+              ? null
+              : spendingPerCurrencyTotals(
+                  allWallets: Provider.of<AllWallets>(context),
+                  pageCurrency: ameenPageCurrency,
+                  isIncome: null,
+                  searchFilters: (searchFilters ?? SearchFilters())
+                      .copyWith(walletPks: walletPks),
+                  forcedDateTimeRange: selectedDateTimeRange,
+                  followCustomPeriodCycle: widget.wallet == null,
+                  onlyIncomeAndExpense: false,
+                ),
           totalWithCountStream: database.watchTotalWithCountOfWallet(
             isIncome: null,
             allWallets: Provider.of<AllWallets>(context),
@@ -787,6 +806,18 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             ),
                             absolute: false,
                             textColor: getColor(context, "black"),
+                            currencyTotalsStream: widget.wallet != null // AMEEN
+                                ? null
+                                : spendingPerCurrencyTotals(
+                                    allWallets: Provider.of<AllWallets>(context),
+                                    pageCurrency: ameenPageCurrency,
+                                    isIncome: null,
+                                    searchFilters: (searchFilters ?? SearchFilters())
+                                        .copyWith(walletPks: walletPks),
+                                    forcedDateTimeRange: selectedDateTimeRange,
+                                    followCustomPeriodCycle: true,
+                                    onlyIncomeAndExpense: false,
+                                  ),
                             label: "net-total".tr(),
                             totalWithCountStream:
                                 database.watchTotalWithCountOfWallet(
@@ -819,6 +850,18 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             ),
                           ),
                           textColor: getColor(context, "expenseAmount"),
+                          currencyTotalsStream: widget.wallet != null // AMEEN
+                              ? null
+                              : spendingPerCurrencyTotals(
+                                  allWallets: Provider.of<AllWallets>(context),
+                                  pageCurrency: ameenPageCurrency,
+                                  isIncome: false,
+                                  searchFilters: (searchFilters ?? SearchFilters())
+                                      .copyWith(walletPks: walletPks),
+                                  forcedDateTimeRange: selectedDateTimeRange,
+                                  followCustomPeriodCycle: widget.wallet == null,
+                                  onlyIncomeAndExpense: true,
+                                ),
                           label: "expense".tr(),
                           totalWithCountStream:
                               database.watchTotalWithCountOfWallet(
@@ -849,6 +892,18 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             ),
                           ),
                           textColor: getColor(context, "incomeAmount"),
+                          currencyTotalsStream: widget.wallet != null // AMEEN
+                              ? null
+                              : spendingPerCurrencyTotals(
+                                  allWallets: Provider.of<AllWallets>(context),
+                                  pageCurrency: ameenPageCurrency,
+                                  isIncome: true,
+                                  searchFilters: (searchFilters ?? SearchFilters())
+                                      .copyWith(walletPks: walletPks),
+                                  forcedDateTimeRange: selectedDateTimeRange,
+                                  followCustomPeriodCycle: widget.wallet == null,
+                                  onlyIncomeAndExpense: true,
+                                ),
                           label: "income".tr(),
                           totalWithCountStream:
                               database.watchTotalWithCountOfWallet(
@@ -2841,7 +2896,9 @@ class AmountSpentEntryRow extends StatelessWidget {
     this.extraText,
     this.absolute = true,
     this.invertSign = false,
+    this.currencyTotalsStream, // AMEEN
   });
+  final Stream<List<CurrencyTotal>>? currencyTotalsStream; // AMEEN
   final Color textColor;
   final String label;
   final Widget openPage;
@@ -2968,7 +3025,12 @@ class AmountSpentEntryRow extends StatelessWidget {
                               },
                             ),
                           ),
-                          CountNumber(
+                          currencyTotalsStream != null // AMEEN: per currency
+                              ? PerCurrencyRowValue(
+                                  stream: currencyTotalsStream!,
+                                  textColor: textColor,
+                                  absolute: absolute)
+                              : CountNumber(
                             lazyFirstRender: false,
                             count: totalSpent,
                             duration: Duration(milliseconds: 1000),

@@ -140,6 +140,7 @@ Stream<List<CurrencyTotal>> watchTotalsPerCurrency({
   SearchFilters? searchFilters,
   bool includeBalanceCorrection = false,
   bool onlyIncomeAndExpense = false,
+  DateTimeRange? forcedDateTimeRange,
 }) {
   List<TransactionWallet> wallets = walletPks == null || walletPks.isEmpty
       ? allWallets.list
@@ -168,6 +169,7 @@ Stream<List<CurrencyTotal>> watchTotalsPerCurrency({
         onlyIncomeAndExpense: onlyIncomeAndExpense,
         convertToPrimary: false,
         searchFilters: searchFilters,
+        forcedDateTimeRange: forcedDateTimeRange,
       )
   ];
 

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/spendingCurrency.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/transactionFilters.dart';
@@ -1029,7 +1030,8 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
                     vertical: 5, horizontal: 5),
-                child: Row(
+                child: perCurrencyMonthBanner(context, dateTimeRange) ?? // AMEEN
+                    Row(
                   children: [
                     Expanded(
                       child: Row(
