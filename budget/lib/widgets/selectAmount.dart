@@ -625,7 +625,8 @@ class _SelectAmountState extends State<SelectAmount> {
                   padding: const EdgeInsetsDirectional.symmetric(vertical: 3.0),
                   child: AnimatedExpanded(
                     axis: Axis.horizontal,
-                    expand: (getSelectedWallet(listen: true)?.walletPk ==
+                    // AMEEN: no "convert to the primary account" (no primary)
+                    expand: false && (getSelectedWallet(listen: true)?.walletPk ==
                                 appStateSettings["selectedWalletPk"] ||
                             ((Provider.of<AllWallets>(context)
                                     .indexedByPk[getSelectedWallet(listen: true)

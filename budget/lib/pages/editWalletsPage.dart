@@ -255,20 +255,9 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                       index: index,
                       enabled: searchValue == "",
                       child: EditRowEntry(
-                      extraIcon: Provider.of<SelectedWalletPk>(context)
-                                  .selectedWalletPk ==
-                              wallet.walletPk
-                          ? appStateSettings["outlinedIcons"]
-                              ? Icons.star_outlined
-                              : Icons.star_rounded
-                          : Icons.star_outline,
-                      onExtra: () async {
-                        setPrimaryWallet(
-                          wallet.walletPk,
-                          allWallets:
-                              Provider.of<AllWallets>(context, listen: false),
-                        );
-                      },
+                      // AMEEN: no star; the Default Account is set in Settings
+                      extraIcon: null,
+                      onExtra: null,
                       canDelete: (wallet.walletPk != "0" ||
                           Provider.of<AllWallets>(context, listen: true)
                                   .indexedByPk

@@ -1,4 +1,4 @@
-import 'package:budget/ameen/currencyLens.dart';
+import 'package:budget/ameen/accountChoice.dart';
 import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/baseCurrency.dart';
@@ -159,8 +159,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
   Budget? selectedBudget;
   bool selectedPaid = true;
   bool selectedBudgetIsShared = false;
-  String selectedWalletPk = defaultWalletPkForLens(
-      appStateSettings["selectedWalletPk"]); // AMEEN: currency view
+  String selectedWalletPk =
+      initialAccountForNewTransaction(); // AMEEN: no primary account
   bool notesInputFocused = false;
   bool showMoreOptions = false;
   List<String> selectedExcludedBudgetPks = [];
@@ -242,13 +242,28 @@ class _AddTransactionPageState extends State<AddTransactionPage>
   void setSelectedTitle(String title, {bool setInput = true}) {
     if (setInput) setTextInput(_titleInputController, title);
     selectedTitle = title.trim();
+    ameenPickAccountForTitle(title); // AMEEN
     return;
   }
 
   void setSelectedTitleController(String title, {bool setInput = true}) {
     if (setInput) setTextInput(_titleInputController, title);
     selectedTitle = title;
+    ameenPickAccountForTitle(title); // AMEEN
     return;
+  }
+
+  // AMEEN: a new transaction takes the account its title was last saved on,
+  // unless an account was chosen some other way
+  String? ameenAccountFromTitle;
+  void ameenPickAccountForTitle(String title) {
+    if (widget.transaction != null) return;
+    String? walletPk = accountForTitle(title);
+    if (walletPk == null || walletPk == selectedWalletPk) return;
+    if (selectedWalletPk != noAccountChosen &&
+        selectedWalletPk != ameenAccountFromTitle) return;
+    ameenAccountFromTitle = walletPk;
+    setSelectedWalletPk(walletPk);
   }
 
   void setSelectedNoteController(String note, {bool setInput = true}) {
@@ -417,6 +432,13 @@ class _AddTransactionPageState extends State<AddTransactionPage>
   }
 
   Future<bool> addTransactionLocked() async {
+    // AMEEN: no account chosen yet, ask for one
+    if (!isAccountChosen(
+        Provider.of<AllWallets>(context, listen: false), selectedWalletPk)) {
+      String? walletPk = await askForAccount(context);
+      if (walletPk == null) return false;
+      setSelectedWalletPk(walletPk);
+    }
     if (appStateSettings["canShowTransactionActionButtonTip"] == true &&
         selectedType != null) {
       await openBottomSheet(
@@ -478,7 +500,10 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         // } else {
         //   await addAssociatedTitles(selectedTitle!, selectedCategory!);
         // }
-        await addAssociatedTitles(selectedTitle!, selectedCategory!);
+        // AMEEN: remember the subcategory and the account too
+        await addAssociatedTitles(
+            selectedTitle!, selectedSubCategory ?? selectedCategory!);
+        await rememberTitleAccount(selectedTitle, selectedWalletPk);
       }
 
       ameenTags = await tagsForSave( // AMEEN: location, rates, foreign amount
@@ -963,7 +988,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         mainAndSubcategory.ignoredSubcategorySelection == false) {
       selectAmountPopup(
         next: () async {
-          await addTransaction();
+          if (!await addTransaction()) return; // AMEEN: account not chosen
           popRoute(context);
           popRoute(context);
         },

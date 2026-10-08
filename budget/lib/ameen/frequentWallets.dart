@@ -42,8 +42,7 @@ List<TransactionWallet> walletsForTransactionChips(
   return wallets
       .where((wallet) =>
           frequent.contains(wallet.walletPk) ||
-          wallet.walletPk == selectedWalletPk ||
-          wallet.walletPk == appStateSettings["selectedWalletPk"])
+          wallet.walletPk == selectedWalletPk)
       .toList();
 }
 

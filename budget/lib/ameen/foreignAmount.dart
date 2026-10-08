@@ -72,8 +72,9 @@ ForeignAmount? foreignAmountOf(Map<String, String> tags) =>
 ForeignAmount? foreignAmountOfNote(String? note) =>
     foreignAmountOf(ameenTagsOf(note));
 
-double marketRate(String fromCurrency, String? toCurrency) =>
-    toCurrency == null ? 1 : (amountRatioFromToCurrency(fromCurrency, toCurrency) ?? 1);
+double marketRate(String fromCurrency, String? toCurrency) => toCurrency == null
+    ? 1
+    : (amountRatioFromToCurrency(fromCurrency, toCurrency) ?? 1);
 
 // Rate of the account's currency to the base, recorded at save time so totals
 // can later use the rate of the transaction's date (multi-currency phase 6):
@@ -160,7 +161,8 @@ class ForeignAmountPad extends StatefulWidget {
 
 class _ForeignAmountPadState extends State<ForeignAmountPad> {
   late String? foreignCurrency = widget.initialForeign?.currency;
-  late double typed = widget.initialForeign?.amount ?? widget.initialAmount ?? 0;
+  late double typed =
+      widget.initialForeign?.amount ?? widget.initialAmount ?? 0;
   int padVersion = 0;
 
   String? get walletCurrency => widget.getWallet()?.currency;
@@ -199,65 +201,68 @@ class _ForeignAmountPadState extends State<ForeignAmountPad> {
           !recentForeignCurrencies().contains(foreignCurrency))
         foreignCurrency,
     ];
-    Widget bar = Padding(
-      padding: const EdgeInsetsDirectional.only(bottom: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SelectChips<String?>(
-            items: choices,
-            allowMultipleSelected: false,
-            getSelected: (c) => (foreignCurrency ?? walletCurrency) == c,
-            onSelected: (c) => pickCurrency(c),
-            getLabel: (c) => (c ?? "").toUpperCase(),
-            extraWidgetBefore: Padding(
-              padding: const EdgeInsetsDirectional.only(start: 5, end: 4),
-              child: TextFont(
-                text: "paid-in".tr(),
-                fontSize: 14,
-                textColor: getColor(context, "textLight"),
-              ),
+    // Foreign amounts need the account's currency: no bar until it is chosen
+    Widget bar = walletCurrency == null
+        ? SizedBox.shrink()
+        : Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SelectChips<String?>(
+                  items: choices,
+                  allowMultipleSelected: false,
+                  getSelected: (c) => (foreignCurrency ?? walletCurrency) == c,
+                  onSelected: (c) => pickCurrency(c),
+                  getLabel: (c) => (c ?? "").toUpperCase(),
+                  extraWidgetBefore: Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 5, end: 4),
+                    child: TextFont(
+                      text: "paid-in".tr(),
+                      fontSize: 14,
+                      textColor: getColor(context, "textLight"),
+                    ),
+                  ),
+                  extraWidgetAfter: SelectChipsAddButtonExtraWidget(
+                    openPage: null,
+                    iconData: Icons.more_horiz_rounded,
+                    onTap: () async {
+                      String? picked = await pickCurrencySheet(
+                        context,
+                        title: "paid-in".tr(),
+                        selected: foreignCurrency ?? walletCurrency,
+                        pinned: recentForeignCurrencies(),
+                      );
+                      if (picked != null) pickCurrency(picked);
+                    },
+                  ),
+                ),
+                if (foreignCurrency != null)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 8, top: 6),
+                    child: TextFont(
+                      text: "≈ " +
+                          convertToMoney(
+                            allWallets,
+                            ForeignAmount(foreignCurrency!, typed, rate)
+                                .chargedAtMarket(walletDecimals),
+                            currencyKey: walletCurrency,
+                            decimals: walletDecimals,
+                          ) +
+                          "  ·  1 " +
+                          foreignCurrency!.toUpperCase() +
+                          " = " +
+                          rate.toStringAsFixed(4) +
+                          " " +
+                          (walletCurrency ?? "").toUpperCase(),
+                      fontSize: 14,
+                      maxLines: 2,
+                      textColor: getColor(context, "textLight"),
+                    ),
+                  ),
+              ],
             ),
-            extraWidgetAfter: SelectChipsAddButtonExtraWidget(
-              openPage: null,
-              iconData: Icons.more_horiz_rounded,
-              onTap: () async {
-                String? picked = await pickCurrencySheet(
-                  context,
-                  title: "paid-in".tr(),
-                  selected: foreignCurrency ?? walletCurrency,
-                  pinned: recentForeignCurrencies(),
-                );
-                if (picked != null) pickCurrency(picked);
-              },
-            ),
-          ),
-          if (foreignCurrency != null)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 8, top: 6),
-              child: TextFont(
-                text: "≈ " +
-                    convertToMoney(
-                      allWallets,
-                      ForeignAmount(foreignCurrency!, typed, rate)
-                          .chargedAtMarket(walletDecimals),
-                      currencyKey: walletCurrency,
-                      decimals: walletDecimals,
-                    ) +
-                    "  ·  1 " +
-                    foreignCurrency!.toUpperCase() +
-                    " = " +
-                    rate.toStringAsFixed(4) +
-                    " " +
-                    (walletCurrency ?? "").toUpperCase(),
-                fontSize: 14,
-                maxLines: 2,
-                textColor: getColor(context, "textLight"),
-              ),
-            ),
-        ],
-      ),
-    );
+          );
     return KeyedSubtree(
       key: ValueKey(padVersion),
       child: widget.builder(
@@ -317,14 +322,16 @@ class ForeignAmountLine extends StatelessWidget {
                 "%"
             : "");
     return Padding(
-      padding: const EdgeInsetsDirectional.symmetric(horizontal: 13, vertical: 4),
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 13, vertical: 4),
       child: Tappable(
         borderRadius: 12,
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        color:
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
         onTap: onEditCharged,
         child: Padding(
-          padding:
-              const EdgeInsetsDirectional.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 12, vertical: 8),
           child: Row(
             children: [
               Icon(Icons.currency_exchange_rounded,
@@ -369,8 +376,7 @@ class NativeTransactionAmount extends StatelessWidget {
     ForeignAmount? foreign = foreignAmountOfNote(transaction.note);
     String? base = baseCurrencyOf(allWallets);
     String? secondary;
-    String? counterpart =
-        transferCounterpartText(allWallets, transaction.note);
+    String? counterpart = transferCounterpartText(allWallets, transaction.note);
     if (foreign != null && foreign.currency != wallet?.currency) {
       secondary = convertToMoney(allWallets, foreign.amount,
           currencyKey: foreign.currency);
@@ -433,8 +439,8 @@ class NativeTransactionAmountsSetting extends StatelessWidget {
       title: "native-transaction-amounts".tr(),
       description: "native-transaction-amounts-description".tr(),
       initialValue: showNativeTransactionAmounts(),
-      onSwitched: (value) => updateSettings(nativeAmountsSetting, value,
-          updateGlobalState: true),
+      onSwitched: (value) =>
+          updateSettings(nativeAmountsSetting, value, updateGlobalState: true),
       icon: appStateSettings["outlinedIcons"]
           ? Icons.payments_outlined
           : Icons.payments_rounded,
@@ -454,8 +460,8 @@ class NativeTransactionAmountsSetting extends StatelessWidget {
     result.remove(foreignAmountTag);
     return (result, foreign.amount);
   }
-  ForeignAmount updated = ForeignAmount(
-      foreign.currency, foreign.amount, marketRate(foreign.currency, wallet.currency));
+  ForeignAmount updated = ForeignAmount(foreign.currency, foreign.amount,
+      marketRate(foreign.currency, wallet.currency));
   result[foreignAmountTag] = updated.toPayload();
   return (result, updated.chargedAtMarket(wallet.decimals));
 }

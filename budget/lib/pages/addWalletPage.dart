@@ -1114,7 +1114,10 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
   DateTime dateInitialized = DateTime.now();
   late double enteredAmount = widget.initialAmount ?? 0;
   late bool isNegative = widget.initialIsNegative ?? false;
-  late TransactionWallet? walletFrom = widget.wallet;
+  // AMEEN: a general transfer starts with no account; one opened from an
+  // account starts from it and is typed in its currency
+  late TransactionWallet? walletFrom =
+      widget.allowEditWallet ? null : widget.wallet;
   TransactionWallet? walletTo;
   late TimeOfDay? selectedTime = widget.initialDate != null
       ? TimeOfDay(
@@ -1123,14 +1126,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
   late DateTime? selectedDateTime = widget.initialDate ?? null;
   late String selectedTitle = widget.initialTitle ?? "";
   ReceivedOverride? ameenReceived; // AMEEN: amount received, if typed
-  late TransactionWallet? walletForCurrency =
-      Provider.of<AllWallets>(context, listen: false)
-                  .indexedByPk[appStateSettings["selectedWalletPk"]]
-                  ?.currency ==
-              widget.wallet?.currency
-          ? widget.wallet
-          : Provider.of<AllWallets>(context, listen: false)
-              .indexedByPk[appStateSettings["selectedWalletPk"]];
+  late TransactionWallet? walletForCurrency = walletFrom; // AMEEN
 
   // double transferFee = 0;
 
@@ -1138,7 +1134,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      if (widget.wallet == null) {
+      if (widget.wallet == null && widget.allowEditWallet == false) { // AMEEN
         walletFrom = await database
             .getWalletInstance(appStateSettings["selectedWalletPk"]);
         setState(() {});
@@ -1208,9 +1204,19 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
     }
 
     enteredAmount = ameenEntered; // AMEEN: amounts come from transferAmounts
-    TransactionWallet walletFrom = this.walletFrom ??
-        Provider.of<AllWallets>(context, listen: false)
-            .indexedByPk[appStateSettings["selectedWalletPk"]]!;
+    if (this.walletFrom == null) { // AMEEN: ask, as for the account below
+      TransactionWallet? result = await selectWalletPopup(
+        context,
+        allowEditWallet: widget.allowEditWallet,
+      );
+      if (result != null)
+        setState(() {
+          this.walletFrom = result;
+          walletForCurrency ??= result;
+        });
+      return;
+    }
+    TransactionWallet walletFrom = this.walletFrom!;
     if (walletTo == null) {
       dynamic result = await selectWalletPopup(
         context,
@@ -1240,8 +1246,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
 
     TransferAmounts ameenTransfer = transferAmounts( // AMEEN
       entered: ameenEntered,
-      enteredCurrency: walletForCurrency?.currency ??
-          allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.currency,
+      enteredCurrency: walletForCurrency?.currency ?? walletFrom.currency,
       from: walletFrom,
       to: walletTo!,
       received: ameenReceived,
@@ -1414,6 +1419,7 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
               walletSelector(walletFrom, (wallet) {
                 setState(() {
                   walletFrom = wallet;
+                  walletForCurrency ??= wallet; // AMEEN: typed in its currency
                 });
               }),
               Padding(
@@ -1567,13 +1573,8 @@ class _TransferBalancePopupState extends State<TransferBalancePopup> {
           ),
           TransferReceivedRow( // AMEEN
             entered: enteredAmount,
-            enteredCurrency: walletForCurrency?.currency ??
-                Provider.of<AllWallets>(context)
-                    .indexedByPk[appStateSettings["selectedWalletPk"]]
-                    ?.currency,
-            from: walletFrom ??
-                Provider.of<AllWallets>(context)
-                    .indexedByPk[appStateSettings["selectedWalletPk"]],
+            enteredCurrency: walletForCurrency?.currency ?? walletFrom?.currency,
+            from: walletFrom,
             to: walletTo,
             received: ameenReceived,
             onReceivedChanged: (value) =>

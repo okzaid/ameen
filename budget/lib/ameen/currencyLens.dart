@@ -71,16 +71,6 @@ Expression<bool> currencyLensWalletFilter($WalletsTable tbl) {
 bool walletInCurrencyLens(String walletPk) =>
     lensWalletPks?.contains(walletPk) ?? true;
 
-// Default account for a new transaction: the primary one, or the first
-// account of the currency being viewed
-String defaultWalletPkForLens(String primaryWalletPk) {
-  Set<String>? pks = lensWalletPks;
-  if (pks == null || pks.contains(primaryWalletPk)) return primaryWalletPk;
-  for (TransactionWallet wallet in allWalletsUnfiltered.list)
-    if (pks.contains(wallet.walletPk)) return wallet.walletPk;
-  return primaryWalletPk;
-}
-
 Future setCurrencyLens(BuildContext context, String? currencyKey) async {
   await updateSettings(currencyLensSetting, currencyKey ?? "",
       updateGlobalState: false);

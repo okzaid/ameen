@@ -1,3 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/ameen/accountChoice.dart';
 import 'package:budget/ameen/scopedCurrency.dart';
 import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/currencyOverrides.dart';
@@ -161,13 +164,13 @@ void main() {
           5);
     });
 
-    test("shows frequent, selected and primary accounts in order", () {
+    test("shows frequent and selected accounts in order, not the default", () {
       appStateSettings[frequentWalletsSetting] = ["w5", "w2"];
       appStateSettings["selectedWalletPk"] = "w0";
       expect(
           pks(walletsForTransactionChips(wallets,
               selectedWalletPk: "w7", canShowAll: true)),
-          ["w0", "w2", "w5", "w7"]);
+          ["w2", "w5", "w7"]);
     });
 
     test("no filtering when there is no show-all button", () {
@@ -455,11 +458,16 @@ void main() {
       expect(amountRatioToPrimaryCurrency(shown, "inr"), 1);
     });
 
-    test("new transactions default to an account of the viewed currency", () {
+    test("new transactions: no account unless the view has only one", () {
       appStateSettings[currencyLensSetting] = "inr";
       applyCurrencyLens(all);
-      expect(defaultWalletPkForLens("adcb"), "icici");
-      expect(defaultWalletPkForLens("hdfc"), "hdfc");
+      expect(initialAccountForNewTransaction(), noAccountChosen);
+      appStateSettings[currencyLensSetting] = "aed";
+      applyCurrencyLens(all);
+      expect(initialAccountForNewTransaction(), "adcb");
+      appStateSettings[currencyLensSetting] = "";
+      applyCurrencyLens(all);
+      expect(initialAccountForNewTransaction(), noAccountChosen);
     });
 
     test("a currency with no accounts falls back to All", () {
@@ -467,7 +475,6 @@ void main() {
       AllWallets shown = applyCurrencyLens(all);
       expect(shown.list.length, 3);
       expect(activeCurrencyLens, isNull);
-      expect(defaultWalletPkForLens("adcb"), "adcb");
     });
   });
 
@@ -504,6 +511,57 @@ void main() {
       expect(isOnlyCurrencyAccounts(all, "inr", ["icici"]), false);
       expect(isOnlyCurrencyAccounts(all, "inr", null), false);
       expect(isOnlyCurrencyAccounts(all, "inr", ["icici", "hdfc", "adcb"]), false);
+    });
+  });
+
+  group("Title accounts", () {
+    TransactionWallet w(String pk, String cur) => TransactionWallet(
+        walletPk: pk, name: pk, dateCreated: DateTime(2026), order: 0,
+        decimals: 2, currency: cur);
+    List<TransactionWallet> wallets = [w("adcb", "aed"), w("icici", "inr")];
+    AllWallets all = AllWallets(
+        list: wallets, indexedByPk: {for (var x in wallets) x.walletPk: x});
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      sharedPreferences = await SharedPreferences.getInstance();
+      appStateSettings[currencyLensSetting] = "";
+      applyCurrencyLens(all);
+      appStateSettings["autoAddAssociatedTitles"] = true;
+      appStateSettings[titleAccountsSetting] = {};
+    });
+
+    test("remembers the account per title, any case", () async {
+      await rememberTitleAccount("Lulu ", "icici");
+      expect(accountForTitle("lulu"), "icici");
+      expect(accountForTitle("LULU"), "icici");
+      expect(accountForTitle("Carrefour"), isNull);
+      await rememberTitleAccount("Lulu", "adcb");
+      expect(accountForTitle("Lulu"), "adcb");
+    });
+
+    test("deleted accounts and other currency views are ignored", () async {
+      await rememberTitleAccount("Taxi", "gone");
+      expect(accountForTitle("Taxi"), isNull);
+      await rememberTitleAccount("Lulu", "icici");
+      appStateSettings[currencyLensSetting] = "aed";
+      applyCurrencyLens(all);
+      expect(accountForTitle("Lulu"), isNull);
+    });
+
+    test("sync keeps the newest entry per title", () {
+      Map<String, dynamic> local = {
+        "lulu": {"w": "icici", "t": "2026-10-01T00:00:00Z"},
+        "taxi": {"w": "adcb", "t": "2026-10-05T00:00:00Z"},
+      };
+      Map<String, dynamic> remote = {
+        "lulu": {"w": "adcb", "t": "2026-10-03T00:00:00Z"},
+        "taxi": {"w": "icici", "t": "2026-10-02T00:00:00Z"},
+        "cafe": {"w": "icici", "t": "2026-10-02T00:00:00Z"},
+      };
+      Map<String, dynamic> merged = mergeTitleAccounts(local, remote);
+      expect(merged["lulu"]["w"], "adcb");
+      expect(merged["taxi"]["w"], "adcb");
+      expect(merged["cafe"]["w"], "icici");
     });
   });
 }

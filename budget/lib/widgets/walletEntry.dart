@@ -119,13 +119,7 @@ class WalletEntry extends StatelessWidget {
               ),
             ),
             onTap: () async {
-              if (selected) {
-                openContainer();
-              } else {
-                setPrimaryWallet(walletWithDetails.wallet.walletPk,
-                    allWallets:
-                        Provider.of<AllWallets>(context, listen: false));
-              }
+              openContainer(); // AMEEN: opens the account, no primary switching
             },
             onLongPress: () {
               pushRoute(
@@ -293,12 +287,7 @@ class WalletEntryRow extends StatelessWidget {
             ),
           ),
           onTap: () async {
-            if (selected || isCurrencyRow) {
-              openContainer();
-            } else {
-              setPrimaryWallet(walletWithDetails.wallet.walletPk,
-                  allWallets: Provider.of<AllWallets>(context, listen: false));
-            }
+            openContainer(); // AMEEN: opens the account, no primary switching
           },
           onLongPress: () async {
             if (isCurrencyRow) {

@@ -62,9 +62,7 @@ class HomePageWalletList extends StatelessWidget {
                             for (WalletWithDetails walletDetails
                                 in snapshot.data!)
                               WalletEntryRow(
-                                selected: Provider.of<SelectedWalletPk>(context)
-                                        .selectedWalletPk ==
-                                    walletDetails.wallet.walletPk,
+                                selected: false, // AMEEN: no primary account
                                 walletWithDetails: walletDetails,
                               ),
                             if (snapshot.hasData && snapshot.data!.length > 0)

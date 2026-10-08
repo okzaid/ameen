@@ -87,7 +87,13 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Currency view | `lib/widgets/watchAllWallets.dart` | app-wide account list passed through `applyCurrencyLens` (only the viewed currency's accounts; index kept) (`lib/ameen/currencyLens.dart`) |
 | Currency view | `lib/database/tables.dart` | `currencyLensFilter` in `onlyShowIfFollowsSearchFilters` (null filters) and `onlyShowTransactionBasedOnSearchQuery`; `currencyLensWalletFilter` in `watchAllWalletsWithDetails` for home sections |
 | Currency view | `lib/pages/homePage/homePage.dart` | `CurrencyLensButton` next to the edit-home button (`SizedBox.shrink` → `Spacer`) |
-| Currency view | `lib/pages/addTransactionPage.dart` | default account via `defaultWalletPkForLens` |
 | Own-currency budgets | `lib/widgets/budgetContainer.dart`, `lib/pages/objectivesListPage.dart` (2) | first lines of `build`: `scopeToWalletCurrency` re-renders the card inside its budget's/goal's currency (`lib/ameen/scopedCurrency.dart`) |
 | Own-currency budgets | `lib/pages/budgetPage.dart`, `pastBudgetsPage.dart`, `objectivePage.dart` | page content wrapped in `walletCurrencyScope` |
 | Own-currency budgets | `lib/pages/addBudgetPage.dart` | `BudgetCurrencyMode` chips (Only ₹ accounts / All currencies ≈) above the account chips; `WalletChipSelector` keyed by `budgetCurrencyModeVersion` |
+| No primary account | `lib/pages/addTransactionPage.dart` | new transactions start with no account (`initialAccountForNewTransaction`), ask at Save (`askForAccount`), take the title's last account (`ameenPickAccountForTitle`); quick-add no longer closes when Save is cancelled (`lib/ameen/accountChoice.dart`) |
+| Titles | `lib/pages/addTransactionPage.dart` | associated titles saved with the subcategory when one is chosen; `rememberTitleAccount` |
+| No primary account | `lib/pages/addWalletPage.dart` | `TransferBalancePopup`: general transfers start with no account, ask for "from" like "to", amount typed in the "from" account's currency |
+| No primary account | `lib/widgets/walletEntry.dart` (2), `homePageWalletSwitcher.dart`, `homePageWalletList.dart` | tapping a Home account card opens it; no primary highlight |
+| No primary account | `lib/pages/editWalletsPage.dart` | ★ removed from the Accounts list |
+| No primary account | `lib/widgets/selectAmount.dart` | "convert to the primary account's currency" chip hidden |
+| No primary account | `lib/pages/settingsPage.dart` | `DefaultAccountSetting` (Cashew's primary account, used only where nothing can be asked) |

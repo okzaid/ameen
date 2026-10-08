@@ -56,6 +56,11 @@
     "all-currencies": "All Currencies",
     "converted-into": "Converted into",
     "only-currency-accounts": "Only {currency} accounts",
-    "all-currencies-converted": "All currencies (≈)"
+    "all-currencies-converted": "All currencies (≈)",
+    "select-account-to-save": "Choose the account for this transaction",
+    "default-account": "Default Account",
+    "default-account-description": "Used only when Ameen can't ask, like links from other apps, the home-screen widget and imports",
+    "currency-label": "Currency Label",
+    "currency-label-description": "Show the currency after account names, e.g. ICICI (INR)"
   }
 }
