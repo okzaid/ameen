@@ -100,7 +100,8 @@ Future<Map<String, String>> tagsForSave({
   required String? walletCurrency,
 }) async {
   Map<String, String> result = Map<String, String>.from(tags);
-  if (isNew) {
+  // A location removed by the user stays removed (empty tag)
+  if (isNew && !result.containsKey(locationTag)) {
     TransactionLocation? location = await locationForNewTransaction();
     if (location != null) result[locationTag] = location.toPayload();
   }

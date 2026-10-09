@@ -405,7 +405,7 @@ class TransactionEntry extends StatelessWidget {
         transaction: transaction,
         iconColor: iconColor,
       );
-      bool showNote = transaction.note.toString().trim() != "";
+      bool showNote = hasVisibleNote(transaction.note); // AMEEN
       Widget note = Row(
         children: [
           TransactionEntryNote(
@@ -415,7 +415,7 @@ class TransactionEntry extends StatelessWidget {
           ),
           Expanded(
             child: TextFont(
-              text: notePreviewWithCity(transaction.note) // AMEEN
+              text: visibleNote(transaction.note) // AMEEN
                   .replaceAll("\n", ", "),
               fontSize: fontSize - 4,
               maxLines: 2,

@@ -21,7 +21,7 @@ class TransactionEntryNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return transaction.note.toString().trim() != ""
+    return hasVisibleNote(transaction.note) // AMEEN: hidden tags aren't a note
         ? Tooltip(
             padding: EdgeInsetsDirectional.only(
                 start: 15, end: 15, top: 10, bottom: 8),
@@ -54,7 +54,7 @@ class TransactionEntryNote extends StatelessWidget {
                 ? Duration(milliseconds: 10000)
                 : Duration(milliseconds: 100),
             message: cleanupNoteStringWithURLs(
-                notePreviewWithCity(transaction.note)), // AMEEN
+                visibleNote(transaction.note)), // AMEEN
             child: Padding(
               padding: padding,
               child: Icon(

@@ -73,7 +73,8 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | Frequent accounts | `lib/pages/addWalletPage.dart` | "Frequent Account" switch next to the group chips |
 | Sync | `lib/struct/syncClient.dart` | `mergeAmeenSyncedSettings()` adopts newer groups/frequent accounts from other devices (`lib/ameen/settingsSync.dart`) |
 | Note tags | `lib/pages/addTransactionPage.dart` | `ameenTags`: hidden note tags (location, foreign amount, transfer counterpart, base rate) read on open, written on save (`lib/ameen/noteTags.dart`); location fetch on open |
-| Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview without the tag, plus "📍 City" |
+| Location | `lib/widgets/transactionEntry/transactionEntry.dart`, `transactionEntryNote.dart` | note preview and note icon use only the user's note (`visibleNote` / `hasVisibleNote`); no city in lists |
+| Location | `lib/pages/addTransactionPage.dart` | `TransactionLocationRow` under Notes: city, Open in Maps, Use current location, Remove location |
 | Location | `lib/pages/settingsPage.dart`, `pubspec.yaml`, `AndroidManifest.xml`, `ios/Runner/Info.plist` | Location Tagging switch, geolocator + geocoding, location permissions |
 | Photo icons | `lib/widgets/selectCategoryImage.dart` | "Photo" tab (`lib/ameen/photoIcons.dart`); stored as `img:<base64 png>` in `iconName` |
 | Base currency | `lib/struct/currencyFunctions.dart` | `amountRatioToPrimaryCurrency` converts into `baseCurrencyOf()`; `getCurrencyString` defaults to it (`lib/ameen/baseCurrency.dart`) |

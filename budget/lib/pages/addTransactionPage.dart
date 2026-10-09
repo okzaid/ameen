@@ -1159,6 +1159,14 @@ class _AddTransactionPageState extends State<AddTransactionPage>
             setSelectedNoteController: setSelectedNoteController,
           ),
         ),
+        Padding( // AMEEN: where the transaction was added
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 22),
+          child: TransactionLocationRow(
+            tags: ameenTags,
+            isNew: widget.transaction == null,
+            onChanged: (tags) => setState(() => ameenTags = tags),
+          ),
+        ),
       ],
     );
 

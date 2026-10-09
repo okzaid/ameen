@@ -61,6 +61,12 @@
     "default-account": "Default Account",
     "default-account-description": "Used only when Ameen can't ask, like links from other apps, the home-screen widget and imports",
     "currency-label": "Currency Label",
-    "currency-label-description": "Show the currency after account names, e.g. ICICI (INR)"
+    "currency-label-description": "Show the currency after account names, e.g. ICICI (INR)",
+    "locating": "Locating…",
+    "add-location": "Add location",
+    "open-in-maps": "Open in Maps",
+    "use-current-location": "Use current location",
+    "remove-location": "Remove location",
+    "location-unavailable": "Couldn't get your location"
   }
 }

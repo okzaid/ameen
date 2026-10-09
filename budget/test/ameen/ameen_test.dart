@@ -190,13 +190,15 @@ void main() {
       expect(parsed!.latitude, closeTo(25.204849, 0.000001));
       expect(parsed.longitude, closeTo(55.270783, 0.000001));
       expect(parsed.city, "Dubai");
-      expect(notePreviewWithCity(note), "Lunch with team  ·  📍 Dubai");
+      expect(visibleNote(note), "Lunch with team");
+      expect(hasVisibleNote(note), true);
     });
     test("empty note and no city", () {
       String note = noteWithLocation("", TransactionLocation(-33.86, 151.2, null));
       expect(noteWithoutLocation(note), "");
       expect(locationOfNote(note)!.city, null);
-      expect(notePreviewWithCity(note), "");
+      expect(visibleNote(note), "");
+      expect(hasVisibleNote(note), false);
     });
     test("re-saving replaces the tag instead of adding another", () {
       String once = noteWithLocation("Taxi", dubai);
@@ -318,7 +320,7 @@ void main() {
       expect(tags[foreignAmountTag], "USD 20.0@3.672500");
       expect(tags[baseRateTag], "AED>INR@22.730000");
       expect(locationOfNote(note)!.city, "Dubai");
-      expect(notePreviewWithCity(note), "Dinner  ·  📍 Dubai");
+      expect(visibleNote(note), "Dinner");
     });
     test("older location-only notes still read", () {
       String old = "Taxi\n\u2063⌖25.204849,55.270783|Dubai";
@@ -366,6 +368,22 @@ void main() {
       );
       expect(same.containsKey(foreignAmountTag), false);
       expect(same[baseRateTag], startsWith("USD>INR@84"));
+    });
+
+    test("a removed location stays removed and is not written", () async {
+      appStateSettings["ameenLocationTagging"] = true;
+      AllWallets none = AllWallets(list: [], indexedByPk: {});
+      Map<String, String> tags = await tagsForSave(
+        tags: {locationTag: ""},
+        isNew: true,
+        allWallets: none,
+        walletCurrency: "aed",
+      );
+      expect(tags[locationTag], "");
+      String note = noteWithAmeenTags("Taxi", tags);
+      expect(locationOfNote(note), null);
+      expect(visibleNote(note), "Taxi");
+      appStateSettings["ameenLocationTagging"] = false;
     });
 
     test("changing the account re-converts the original", () {
