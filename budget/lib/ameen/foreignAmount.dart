@@ -1,3 +1,5 @@
+import 'package:budget/widgets/framework/popupFramework.dart';
+import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/ameen/transfers.dart';
 import 'package:budget/ameen/currencySheet.dart';
 import 'package:budget/ameen/baseCurrency.dart';
@@ -194,54 +196,20 @@ class _ForeignAmountPadState extends State<ForeignAmountPad> {
   @override
   Widget build(BuildContext context) {
     AllWallets allWallets = Provider.of<AllWallets>(context);
-    List<String?> choices = [
-      walletCurrency,
-      ...recentForeignCurrencies().where((c) => c != walletCurrency),
-      if (foreignCurrency != null &&
-          !recentForeignCurrencies().contains(foreignCurrency))
-        foreignCurrency,
-    ];
-    // Foreign amounts need the account's currency: no bar until it is chosen
+    // Foreign amounts need the account's currency: no chip until it is chosen.
+    // One chip under the amount ("$ ▾"); tapping it opens the currency sheet.
+    String? shown = foreignCurrency ?? walletCurrency;
     Widget bar = walletCurrency == null
         ? SizedBox.shrink()
         : Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsetsDirectional.only(bottom: 8, end: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SelectChips<String?>(
-                  items: choices,
-                  allowMultipleSelected: false,
-                  getSelected: (c) => (foreignCurrency ?? walletCurrency) == c,
-                  onSelected: (c) => pickCurrency(c),
-                  getLabel: (c) => (c ?? "").toUpperCase(),
-                  extraWidgetBefore: Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 5, end: 4),
-                    child: TextFont(
-                      text: "paid-in".tr(),
-                      fontSize: 14,
-                      textColor: getColor(context, "textLight"),
-                    ),
-                  ),
-                  extraWidgetAfter: SelectChipsAddButtonExtraWidget(
-                    openPage: null,
-                    iconData: Icons.more_horiz_rounded,
-                    onTap: () async {
-                      String? picked = await pickCurrencySheet(
-                        context,
-                        title: "paid-in".tr(),
-                        selected: foreignCurrency ?? walletCurrency,
-                        pinned: recentForeignCurrencies(),
-                      );
-                      if (picked != null) pickCurrency(picked);
-                    },
-                  ),
-                ),
                 if (foreignCurrency != null)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8, top: 6),
+                  Flexible(
                     child: TextFont(
-                      text: "≈ " +
+                      text: "→ " +
                           convertToMoney(
                             allWallets,
                             ForeignAmount(foreignCurrency!, typed, rate)
@@ -250,16 +218,45 @@ class _ForeignAmountPadState extends State<ForeignAmountPad> {
                             decimals: walletDecimals,
                           ) +
                           "  ·  1 " +
-                          foreignCurrency!.toUpperCase() +
+                          currencySymbolLabel(foreignCurrency!) +
                           " = " +
                           rate.toStringAsFixed(4) +
                           " " +
-                          (walletCurrency ?? "").toUpperCase(),
-                      fontSize: 14,
+                          currencySymbolLabel(walletCurrency!),
+                      fontSize: 13,
                       maxLines: 2,
+                      textAlign: TextAlign.end,
                       textColor: getColor(context, "textLight"),
                     ),
                   ),
+                SizedBox(width: 8),
+                Tappable(
+                  borderRadius: 10,
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  onTap: () async {
+                    String? picked = await pickPaidInCurrency(
+                      context,
+                      selected: shown,
+                      accountCurrency: walletCurrency!,
+                    );
+                    if (picked != null) pickCurrency(picked);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                        start: 14, end: 6, top: 7, bottom: 7),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFont(
+                            text: currencySymbolLabel(shown!),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold),
+                        Icon(Icons.arrow_drop_down_rounded,
+                            size: 20, color: getColor(context, "textLight")),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -464,4 +461,84 @@ class NativeTransactionAmountsSetting extends StatelessWidget {
       marketRate(foreign.currency, wallet.currency));
   result[foreignAmountTag] = updated.toPayload();
   return (result, updated.chargedAtMarket(wallet.decimals));
+}
+
+// "$", "₹", "Đ"; the code when there is no symbol or it is shared ("C$" → "CAD")
+String currencySymbolLabel(String currency) {
+  if (currency == "aed") return String.fromCharCode(0x20C3);
+  String symbol = (currenciesJSON[currency]?["Symbol"] ?? "").toString();
+  if (symbol == "" || symbol.length > 3) return currency.toUpperCase();
+  int sharing = currenciesJSON.entries
+      .where((e) =>
+          e.key != currency &&
+          (e.value?["Symbol"] ?? "") == symbol &&
+          (e.value?["CountryName"] ?? "").toString() != "")
+      .length;
+  if (sharing > 0 && currency != "usd") return currency.toUpperCase();
+  return symbol;
+}
+
+// Paid in: the account's currency and recent ones as chips, then search
+Future<String?> pickPaidInCurrency(BuildContext context,
+    {required String? selected, required String accountCurrency}) async {
+  List<String> choices = [
+    accountCurrency,
+    ...recentForeignCurrencies().where((c) => c != accountCurrency),
+  ];
+  String? result;
+  await openBottomSheet(
+    context,
+    PopupFramework(
+      title: "paid-in".tr(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SelectChips<String>(
+            items: choices,
+            wrapped: true,
+            getSelected: (c) => c == selected,
+            onSelected: (c) {
+              result = c;
+              popRoute(context);
+            },
+            getLabel: (c) => currencySymbolLabel(c),
+          ),
+          SizedBox(height: 10),
+          Tappable(
+            borderRadius: 12,
+            color: getColor(context, "lightDarkAccentHeavyLight"),
+            onTap: () async {
+              String? picked = await pickCurrencySheet(
+                context,
+                title: "paid-in".tr(),
+                selected: selected,
+                pinned: choices,
+              );
+              if (picked != null) {
+                result = picked;
+                popRoute(context);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.search_rounded,
+                      size: 20, color: getColor(context, "textLight")),
+                  SizedBox(width: 10),
+                  TextFont(
+                    text: "search-currencies-placeholder".tr(),
+                    fontSize: 15,
+                    textColor: getColor(context, "textLight"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+  return result;
 }
