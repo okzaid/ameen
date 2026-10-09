@@ -47,8 +47,8 @@ class AboutUsPage extends StatelessWidget {
       },
       listWidgets: [
         Padding(
-          padding:
-              const EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 7),
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 15, vertical: 7),
           child: _AppInformation(),
         ),
         SizedBox(height: 5),
@@ -57,42 +57,55 @@ class AboutUsPage extends StatelessWidget {
         HorizontalBreak(),
         SizedBox(height: 10),
         Padding(
-          padding:
-              const EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 5),
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 15, vertical: 5),
           child: Tappable(
             onTap: () => openUrl('mailto:' + ameenContactEmail),
             onLongPress: () => copyToClipboard(ameenContactEmail),
             color: containerColor,
             borderRadius: borderRadius,
-            child: Padding(
-              padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: 13, vertical: 15),
-              child: Column(
-                children: [
-                  TextFont(
-                    text: "lead-developer".tr(),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.center,
-                    maxLines: 5,
+            child: Stack(
+              children: [
+                PositionedDirectional(
+                  top: 6,
+                  end: 6,
+                  child: _OpenLinkButton(url: ameenDeveloperWebsite),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                      horizontal: 13, vertical: 15),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        TextFont(
+                          text: "made-by".tr(),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          textAlign: TextAlign.center,
+                          maxLines: 5,
+                        ),
+                        TextFont(
+                          text: ameenDeveloperName,
+                          fontSize: 29,
+                          fontWeight: FontWeight.bold,
+                          textColor:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          textAlign: TextAlign.center,
+                          maxLines: 5,
+                        ),
+                        TextFont(
+                          text: ameenContactEmail,
+                          fontSize: 16,
+                          textAlign: TextAlign.center,
+                          maxLines: 5,
+                          textColor: getColor(context, "textLight"),
+                        ),
+                      ],
+                    ),
                   ),
-                  TextFont(
-                    text: ameenDeveloperName,
-                    fontSize: 29,
-                    fontWeight: FontWeight.bold,
-                    textColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                    textAlign: TextAlign.center,
-                    maxLines: 5,
-                  ),
-                  TextFont(
-                    text: ameenContactEmail,
-                    fontSize: 16,
-                    textAlign: TextAlign.center,
-                    maxLines: 5,
-                    textColor: getColor(context, "textLight"),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -194,9 +207,8 @@ class _AboutUsLinks extends StatelessWidget {
               context,
               isExternalLink: true,
               onTap: () => openUrl(ameenFaqUrl),
-              icon: outlined
-                  ? Icons.live_help_outlined
-                  : Icons.live_help_rounded,
+              icon:
+                  outlined ? Icons.live_help_outlined : Icons.live_help_rounded,
               text: "guide-and-faq".tr(),
             ),
             const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
@@ -337,8 +349,8 @@ class _BasedOnUpstreamCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFont(
-                      text: "based-on-app".tr(
-                          namedArgs: {"upstream": upstreamAppName}),
+                      text: "based-on-app"
+                          .tr(namedArgs: {"upstream": upstreamAppName}),
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       maxLines: 5,
@@ -357,15 +369,34 @@ class _BasedOnUpstreamCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                outlined
-                    ? Icons.keyboard_arrow_right_outlined
-                    : Icons.keyboard_arrow_right_rounded,
-                size: 22,
-                color: getColor(context, "black").withOpacity(0.3),
-              ),
+              SizedBox(width: 6),
+              _OpenLinkButton(url: upstreamGithubUrl),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// Small "open in browser" arrow, separate from its card's own tap
+class _OpenLinkButton extends StatelessWidget {
+  const _OpenLinkButton({required this.url});
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tappable(
+      borderRadius: 100,
+      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6),
+      onTap: () => openUrl(url),
+      onLongPress: () => copyToClipboard(url),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.all(7),
+        child: Icon(
+          Icons.arrow_outward_rounded,
+          size: 18,
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
         ),
       ),
     );

@@ -67,6 +67,7 @@
     "open-in-maps": "Open in Maps",
     "use-current-location": "Use current location",
     "remove-location": "Remove location",
-    "location-unavailable": "Couldn't get your location"
+    "location-unavailable": "Couldn't get your location",
+    "made-by": "Made by"
   }
 }

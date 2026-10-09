@@ -17,6 +17,7 @@ const String ameenPlayStoreUrl =
 
 const String ameenDeveloperName = "Zaid Shaikh";
 const String ameenContactEmail = "contact@zaidshaikh.com";
+const String ameenDeveloperWebsite = "https://zaidshaikh.com";
 
 // Upstream project this app is based on (GPL-3.0)
 const String upstreamAppName = "Cashew";
