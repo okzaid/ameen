@@ -1,3 +1,4 @@
+import 'package:budget/pages/editWalletsPage.dart';
 import 'dart:math';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/editBudgetPage.dart';
@@ -473,6 +474,16 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
         NavBarShortcutSelection(
           shortcutAppSettingKey: shortcutAppSettingKey,
           navBarIconDataKey: "loans",
+        ),
+        NavBarShortcutSelection( // AMEEN: accounts as a shortcut
+          shortcutAppSettingKey: shortcutAppSettingKey,
+          navBarIconDataKey: "accountDetails",
+          onSettings: () {
+            openBottomSheet(
+              context,
+              PopupFramework(hasPadding: false, child: WalletsSettings()),
+            );
+          },
         ),
       ],
     );

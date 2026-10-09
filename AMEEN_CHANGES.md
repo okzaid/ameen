@@ -101,3 +101,4 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | No primary account | `lib/pages/editWalletsPage.dart` | ★ removed from the Accounts list |
 | No primary account | `lib/widgets/selectAmount.dart` | "convert to the primary account's currency" chip hidden |
 | No primary account | `lib/pages/settingsPage.dart` | `DefaultAccountSetting` (Cashew's primary account, used only where nothing can be asked) |
+| Accounts shortcut | `lib/widgets/bottomNavBar.dart` | "Accounts" (`accountDetails`) added to the bottom bar shortcut picker, gear opens `WalletsSettings` |
