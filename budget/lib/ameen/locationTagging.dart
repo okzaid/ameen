@@ -1,7 +1,8 @@
 import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/pages/addTransactionPage.dart' show LinkInNotes;
+import 'package:budget/pages/addTransactionPage.dart'
+    show LinkInNotes, SelectText;
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
@@ -289,6 +290,30 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
     setLocation(found);
   }
 
+  // The name shown for the place; the saved coordinates stay as they are
+  void renamePlace(TransactionLocation location) {
+    String name = location.city ?? "";
+    openBottomSheet(
+      context,
+      PopupFramework(
+        title: "rename-place".tr(),
+        child: SelectText(
+          labelText: "place-name".tr(),
+          selectedText: name,
+          setSelectedText: (value) => name = value,
+          textCapitalization: TextCapitalization.words,
+          maxLength: 60,
+          buttonLabel: "set-name".tr(),
+          next: () {
+            String trimmed = name.trim();
+            setLocation(TransactionLocation(location.latitude,
+                location.longitude, trimmed == "" ? null : trimmed));
+          },
+        ),
+      ),
+    );
+  }
+
   void openActions(TransactionLocation location) {
     bool outlined = appStateSettings["outlinedIcons"] == true;
     Widget action(String label, IconData iconData, VoidCallback onTap) =>
@@ -321,6 +346,11 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
                   location.latitude.toStringAsFixed(6) +
                   "," +
                   location.longitude.toStringAsFixed(6)),
+            ),
+            action(
+              "rename-place".tr(),
+              outlined ? Icons.edit_outlined : Icons.edit_rounded,
+              () => renamePlace(location),
             ),
             action(
               "use-current-location".tr(),

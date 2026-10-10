@@ -68,6 +68,8 @@
     "use-current-location": "Use current location",
     "remove-location": "Remove location",
     "location-unavailable": "Couldn't get your location",
-    "made-by": "Made by"
+    "made-by": "Made by",
+    "rename-place": "Rename place",
+    "place-name": "Place name"
   }
 }
