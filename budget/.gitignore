@@ -55,3 +55,6 @@ keystore.jks
 
 /.firebase
 .firebase/
+# AMEEN: never commit signing keys
+*.jks
+*.keystore
