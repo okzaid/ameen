@@ -10,7 +10,6 @@ import 'package:budget/pages/debugPage.dart';
 import 'package:budget/struct/languageMap.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
-import 'package:budget/widgets/moreIcons.dart';
 import 'package:budget/widgets/navigationSidebar.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/ratingPopup.dart';
@@ -157,10 +156,14 @@ class _AppInformation extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 10),
-              child: TextFont(
-                text: getVersionString(),
-                fontSize: 14,
-                maxLines: 5,
+              // Tapping the version opens the open-source licences
+              child: GestureDetector(
+                onTap: () => openLicensesPage(context),
+                child: TextFont(
+                  text: getVersionString(),
+                  fontSize: 14,
+                  maxLines: 5,
+                ),
               ),
             ),
           ],
@@ -193,14 +196,6 @@ class _AboutUsLinks extends StatelessWidget {
               onTap: () => openUrl(ameenWebsiteUrl),
               icon: outlined ? Icons.language_outlined : Icons.language_rounded,
               text: "website".tr(),
-            ),
-            const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
-            _linkRow(
-              context,
-              isExternalLink: true,
-              onTap: () => openUrl(ameenGithubUrl),
-              icon: MoreIcons.github,
-              text: "app-is-open-source".tr(namedArgs: {"app": globalAppName}),
             ),
             const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
             _linkRow(
@@ -239,16 +234,6 @@ class _AboutUsLinks extends StatelessWidget {
               onTap: () => openUrl(ameenPrivacyPolicyUrl),
               icon: outlined ? Icons.policy_outlined : Icons.policy_rounded,
               text: "privacy-policy".tr(),
-            ),
-            const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
-            _linkRow(
-              context,
-              isExternalLink: false,
-              onTap: () => openLicensesPage(context),
-              icon: outlined
-                  ? Icons.account_balance_outlined
-                  : Icons.account_balance_rounded,
-              text: "view-licenses-and-legalese".tr(),
             ),
             const HorizontalBreak(padding: EdgeInsetsDirectional.zero),
             _linkRow(
