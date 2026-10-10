@@ -49,3 +49,17 @@ jobs:
           name: ameen-apk-${{ github.sha }}
           path: budget/build/app/outputs/flutter-apk/*.apk
           retention-days: 14
+      # AMEEN: send the arm64 APK (most phones) to testers in Firebase App
+      # Distribution, who get it as an update in the Firebase App Tester app.
+      # Needs the repository secret FIREBASE_SERVICE_ACCOUNT_JSON and a tester
+      # group with the alias "testers"; skipped until the secret is set.
+      - name: Send to testers (Firebase App Distribution)
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        if: env.SERVICE_ACCOUNT_JSON != ''
+        run: |
+          echo "$SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+          git log -1 --pretty=%B | head -c 15000 > "$RUNNER_TEMP/notes.txt"
+          npx --yes firebase-tools@13 appdistribution:distribute             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk             --app 1:574981835110:android:6ab14e7cf967bb6d4d60a7             --groups testers             --release-notes-file "$RUNNER_TEMP/notes.txt"
+          rm -f "$RUNNER_TEMP/firebase-sa.json"
