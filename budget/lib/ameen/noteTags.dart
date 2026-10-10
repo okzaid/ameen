@@ -22,11 +22,8 @@ const List<String> knownTags = [
   baseRateTag,
 ];
 
-final RegExp _tagBlock = RegExp(r"\n?((?:" +
-    tagSeparator +
-    "[^" +
-    tagSeparator +
-    r"\n]+)+)\s*$");
+final RegExp _tagBlock =
+    RegExp(r"\n?((?:" + tagSeparator + "[^" + tagSeparator + r"\n]+)+)\s*$");
 
 Map<String, String> ameenTagsOf(String? note) {
   Map<String, String> tags = {};

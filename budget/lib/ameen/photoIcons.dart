@@ -31,8 +31,8 @@ MemoryImage? photoIconImage(String iconName) {
   MemoryImage? cached = _decoded[key];
   if (cached != null) return cached;
   try {
-    MemoryImage image = MemoryImage(
-        base64Decode(iconName.substring(photoIconPrefix.length)));
+    MemoryImage image =
+        MemoryImage(base64Decode(iconName.substring(photoIconPrefix.length)));
     _decoded[key] = image;
     return image;
   } catch (e) {
@@ -45,10 +45,10 @@ MemoryImage? photoIconImage(String iconName) {
 Future<Uint8List?> squarePhotoIconPng(Uint8List bytes) async {
   ui.Codec codec = await ui.instantiateImageCodec(bytes);
   ui.Image source = (await codec.getNextFrame()).image;
-  double side = (source.width < source.height ? source.width : source.height)
-      .toDouble();
-  Rect sourceRect = Rect.fromLTWH((source.width - side) / 2,
-      (source.height - side) / 2, side, side);
+  double side =
+      (source.width < source.height ? source.width : source.height).toDouble();
+  Rect sourceRect = Rect.fromLTWH(
+      (source.width - side) / 2, (source.height - side) / 2, side, side);
   ui.PictureRecorder recorder = ui.PictureRecorder();
   Canvas canvas = Canvas(recorder);
   canvas.drawImageRect(
@@ -57,9 +57,8 @@ Future<Uint8List?> squarePhotoIconPng(Uint8List bytes) async {
     Rect.fromLTWH(0, 0, photoIconSize.toDouble(), photoIconSize.toDouble()),
     Paint()..filterQuality = FilterQuality.high,
   );
-  ui.Image result = await recorder
-      .endRecording()
-      .toImage(photoIconSize, photoIconSize);
+  ui.Image result =
+      await recorder.endRecording().toImage(photoIconSize, photoIconSize);
   ByteData? data = await result.toByteData(format: ui.ImageByteFormat.png);
   return data?.buffer.asUint8List();
 }
@@ -88,9 +87,8 @@ Future<List<String>> usedPhotoIcons() async {
     if (isPhotoIcon(iconName)) found.add(iconName!);
   }
 
-  for (TransactionCategory category
-      in await database.getAllCategories(includeSubCategories: true))
-    add(category.iconName);
+  for (TransactionCategory category in await database.getAllCategories(
+      includeSubCategories: true)) add(category.iconName);
   for (TransactionWallet wallet in await database.getAllWallets())
     add(wallet.iconName);
   for (Objective objective in await database.getAllObjectivesWithoutType())

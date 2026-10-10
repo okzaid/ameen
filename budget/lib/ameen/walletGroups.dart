@@ -1,3 +1,4 @@
+import 'package:budget/ameen/recentPlaces.dart';
 import 'package:budget/ameen/currencyLens.dart';
 import 'package:budget/ameen/baseCurrency.dart';
 import 'package:budget/ameen/locationTagging.dart';
@@ -45,7 +46,8 @@ const String walletGroupsSetting = "ameenWalletGroups";
 const String walletGroupOfSetting = "ameenWalletGroupOf";
 
 class WalletGroup {
-  WalletGroup({required this.pk, required this.name, this.iconName, this.colour});
+  WalletGroup(
+      {required this.pk, required this.name, this.iconName, this.colour});
   final String pk;
   String name;
   // Same format as account icons (see walletIcon.dart)
@@ -134,9 +136,8 @@ Future<String?> openWalletGroupEditor(
     context,
     popupWithKeyboard: true,
     PopupFramework(
-      title: group == null
-          ? "add-account-group".tr()
-          : "edit-account-group".tr(),
+      title:
+          group == null ? "add-account-group".tr() : "edit-account-group".tr(),
       child: _WalletGroupEditor(
         group: group,
         onSaved: (pk) => savedPk = pk,
@@ -211,7 +212,9 @@ class _WalletGroupEditorState extends State<_WalletGroupEditor> {
         ),
         SizedBox(height: 15),
         Button(
-          label: widget.group == null ? "add-account-group".tr() : "save-changes".tr(),
+          label: widget.group == null
+              ? "add-account-group".tr()
+              : "save-changes".tr(),
           onTap: save,
           disabled: name.trim() == "",
           expandedLayout: true,
@@ -222,8 +225,7 @@ class _WalletGroupEditorState extends State<_WalletGroupEditor> {
 }
 
 Future _saveWalletGroupOf(Map<String, String> groupOf) async {
-  await updateSettings(walletGroupOfSetting, groupOf,
-      updateGlobalState: false);
+  await updateSettings(walletGroupOfSetting, groupOf, updateGlobalState: false);
   await touchAmeenSyncedSettings();
 }
 
@@ -686,6 +688,7 @@ const String accountGroupsHomeSetting = "showAmeenAccountGroups";
 Future migrateAmeenSettings() async {
   await migrateBaseCurrency();
   await initCurrencyLens();
+  seedRecentPlaces(); // in the background
   registerAmeenFontLicenses();
   warmUpLocation();
   for (String orderKey in ["homePageOrder", "homePageOrderFullScreen"]) {

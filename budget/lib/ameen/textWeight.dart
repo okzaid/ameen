@@ -45,15 +45,19 @@ class TextWeightSetting extends StatelessWidget {
       initial: (appStateSettings[textWeightSetting] ?? "regular").toString(),
       getLabel: (value) => ("text-weight-" + value).tr(),
       onChanged: (value) async {
-        await updateSettings(textWeightSetting, value,
-            updateGlobalState: true);
+        await updateSettings(textWeightSetting, value, updateGlobalState: true);
       },
     );
   }
 }
 
 // Extra fonts in the font picker (pubspec family names, OFL licensed)
-const List<String> ameenExtraFonts = ["Nunito", "Outfit", "Manrope", "Urbanist"];
+const List<String> ameenExtraFonts = [
+  "Nunito",
+  "Outfit",
+  "Manrope",
+  "Urbanist"
+];
 
 // Shows the fonts' OFL licences on the app's licences page
 void registerAmeenFontLicenses() {

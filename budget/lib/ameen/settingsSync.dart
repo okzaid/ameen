@@ -1,3 +1,4 @@
+import 'package:budget/ameen/recentPlaces.dart';
 import 'package:budget/ameen/accountChoice.dart';
 import 'dart:convert';
 
@@ -45,7 +46,9 @@ Future mergeAmeenSyncedSettings(FinanceDatabase otherDevice) async {
     Map<String, dynamic> remote =
         json.decode((await otherDevice.getSettings()).settingsJSON);
     await mergeTitleAccountsFrom(remote);
-    Map<String, dynamic>? newer = pickNewerAmeenSettings(appStateSettings, remote);
+    await mergeRecentPlacesFrom(remote);
+    Map<String, dynamic>? newer =
+        pickNewerAmeenSettings(appStateSettings, remote);
     if (newer == null) return;
     for (MapEntry<String, dynamic> entry in newer.entries) {
       await updateSettings(entry.key, entry.value, updateGlobalState: false);

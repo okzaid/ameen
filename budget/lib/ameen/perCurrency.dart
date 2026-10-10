@@ -21,7 +21,8 @@ import 'package:provider/provider.dart';
 
 const String perCurrencyTotalsSetting = "ameenPerCurrencyTotals";
 
-bool showTotalsPerCurrency() => appStateSettings[perCurrencyTotalsSetting] != false;
+bool showTotalsPerCurrency() =>
+    appStateSettings[perCurrencyTotalsSetting] != false;
 
 class CurrencyTotal {
   CurrencyTotal({
@@ -71,7 +72,8 @@ List<CurrencyTotal> walletTotalsPerCurrency(
 double convertedTotal(AllWallets allWallets, List<CurrencyTotal> totals) {
   double sum = 0;
   for (CurrencyTotal total in totals) {
-    sum += total.total * amountRatioToPrimaryCurrency(allWallets, total.currency);
+    sum +=
+        total.total * amountRatioToPrimaryCurrency(allWallets, total.currency);
   }
   return sum;
 }
@@ -94,7 +96,8 @@ String formatTotals(AllWallets allWallets, List<CurrencyTotal> totals,
   if ((perCurrency ?? showTotalsPerCurrency()) == false || totals.length == 1) {
     if (totals.length == 1)
       return formatCurrencyTotal(allWallets, totals.first,
-          addCurrencyName: currencyNeedsName(allWallets, totals.first.currency));
+          addCurrencyName:
+              currencyNeedsName(allWallets, totals.first.currency));
     return convertToMoney(allWallets, convertedTotal(allWallets, totals));
   }
   bool addCurrencyName = needsCurrencyName(totals);
@@ -107,8 +110,8 @@ String formatTotals(AllWallets allWallets, List<CurrencyTotal> totals,
 // Code is added only when the symbol alone is ambiguous: no symbol, or
 // another of the user's account currencies uses the same symbol (USD, CAD)
 bool currencyNeedsName(AllWallets allWallets, String? currency) {
-  currency ??= allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]
-      ?.currency;
+  currency ??=
+      allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.currency;
   String symbol = currenciesJSON[currency]?["Symbol"] ?? "";
   if (symbol == "") return true;
   for (String? other in allWallets.list.map((w) => w.currency).toSet()) {

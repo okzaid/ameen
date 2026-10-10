@@ -1,3 +1,4 @@
+import 'package:budget/ameen/recentPlaces.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/ameen/transfers.dart';
@@ -116,6 +117,8 @@ Future<Map<String, String>> tagsForSave({
   ForeignAmount? foreign = foreignAmountOf(result);
   if (foreign != null && foreign.currency == walletCurrency)
     result.remove(foreignAmountTag);
+  await rememberRecentPlace(
+      TransactionLocation.fromPayload(result[locationTag])?.city);
   return result;
 }
 

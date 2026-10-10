@@ -1,3 +1,4 @@
+import 'package:budget/ameen/recentPlaces.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/ameen/accountChoice.dart';
@@ -590,6 +591,49 @@ void main() {
       expect(merged["lulu"]["w"], "adcb");
       expect(merged["taxi"]["w"], "adcb");
       expect(merged["cafe"]["w"], "icici");
+    });
+  });
+
+  group("Recent places", () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      sharedPreferences = await SharedPreferences.getInstance();
+      appStateSettings[recentPlacesSetting] = {};
+    });
+
+    test("newest first, one entry per name, filtered by typing", () async {
+      await rememberRecentPlace("Old Town");
+      await Future.delayed(Duration(milliseconds: 5));
+      await rememberRecentPlace("Madinah Market");
+      await Future.delayed(Duration(milliseconds: 5));
+      await rememberRecentPlace("old town ");
+      expect(recentPlaces(), ["old town", "Madinah Market"]);
+      expect(recentPlacesMatching("MAD"), ["Madinah Market"]);
+      expect(recentPlacesMatching("old town"), isEmpty);
+      await rememberRecentPlace("  ");
+      expect(recentPlaces().length, 2);
+    });
+
+    test("shows at most 20", () async {
+      for (int i = 0; i < 30; i++) {
+        await rememberRecentPlace("Place " + i.toString());
+        await Future.delayed(Duration(milliseconds: 2));
+      }
+      expect(recentPlaces().length, recentPlacesShown);
+      expect(recentPlaces().first, "Place 29");
+    });
+
+    test("sync keeps the newest entry per name", () {
+      Map<String, dynamic> local = {
+        "dubai": {"n": "Dubai", "t": "2026-10-01T00:00:00Z"},
+      };
+      Map<String, dynamic> remote = {
+        "dubai": {"n": "DUBAI", "t": "2026-10-05T00:00:00Z"},
+        "sharjah": {"n": "Sharjah", "t": "2026-10-02T00:00:00Z"},
+      };
+      Map<String, dynamic> merged = mergeRecentPlaces(local, remote);
+      expect(merged["dubai"]["n"], "DUBAI");
+      expect(merged["sharjah"]["n"], "Sharjah");
     });
   });
 }

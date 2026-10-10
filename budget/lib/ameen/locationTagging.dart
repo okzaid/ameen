@@ -1,3 +1,4 @@
+import 'package:budget/ameen/recentPlaces.dart';
 import 'package:budget/ameen/noteTags.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
@@ -301,29 +302,44 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
   // With no location yet, this types a place by hand.
   void renamePlace(TransactionLocation? location) {
     String name = location?.city ?? "";
+    // Recent places above the input (still visible with the keyboard open),
+    // filtered by what is typed; tapping one picks it
+    ValueNotifier<String> typed = ValueNotifier("");
+    void apply(String value) {
+      String trimmed = value.trim();
+      TransactionLocation updated = TransactionLocation(location?.latitude,
+          location?.longitude, trimmed == "" ? null : trimmed);
+      // No name and no coordinates: nothing left to keep
+      if (updated.hasCoordinates || updated.city != null)
+        setLocation(updated);
+      else if (location != null) setLocation(null);
+    }
+
     openBottomSheet(
       context,
       PopupFramework(
         title: (location == null ? "type-a-place" : "rename-place").tr(),
-        child: SelectText(
-          labelText: "place-name".tr(),
-          selectedText: name,
-          setSelectedText: (value) => name = value,
-          textCapitalization: TextCapitalization.words,
-          maxLength: 60,
-          buttonLabel: "set-name".tr(),
-          next: () {
-            String trimmed = name.trim();
-            TransactionLocation updated = TransactionLocation(
-                location?.latitude,
-                location?.longitude,
-                trimmed == "" ? null : trimmed);
-            // No name and no coordinates: nothing left to keep
-            if (updated.hasCoordinates || updated.city != null)
-              setLocation(updated);
-            else if (location != null) setLocation(null);
-          },
-        ),
+        child: Column(children: [
+          RecentPlaceChips(
+            query: typed,
+            onSelected: (place) {
+              popRoute(context);
+              apply(place);
+            },
+          ),
+          SelectText(
+            labelText: "place-name".tr(),
+            selectedText: name,
+            setSelectedText: (value) {
+              name = value;
+              typed.value = value;
+            },
+            textCapitalization: TextCapitalization.words,
+            maxLength: 60,
+            buttonLabel: "set-name".tr(),
+            next: () => apply(name),
+          ),
+        ]),
       ),
     );
   }

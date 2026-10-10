@@ -54,7 +54,8 @@ Map<String, dynamic> applyAmeenTranslationOverrides(
   });
   Map<String, dynamic> forLang =
       Map<String, dynamic>.from(overrides[lang] ?? {});
-  if (lang == "none") forLang = Map<String, dynamic>.from(overrides["en"] ?? {});
+  if (lang == "none")
+    forLang = Map<String, dynamic>.from(overrides["en"] ?? {});
   forLang.forEach((key, value) {
     if (isBaseLanguage || result.containsKey(key)) result[key] = value;
   });

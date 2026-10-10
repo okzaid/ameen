@@ -55,7 +55,8 @@ class WalletIcon extends StatelessWidget {
         height: size,
         child: Center(
           child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.noScaling),
             child: TextFont(
               text: emoji,
               fontSize: size * 0.8,
@@ -104,7 +105,8 @@ class WalletIconPicker extends StatelessWidget {
             title: "select-icon".tr(),
             child: SelectCategoryImage(
               color: color,
-              selectedImage: image == null ? null : "assets/categories/" + image,
+              selectedImage:
+                  image == null ? null : "assets/categories/" + image,
               setSelectedImage: (String? selected) {
                 onChanged(walletIconNameFrom(
                     image: (selected ?? "")

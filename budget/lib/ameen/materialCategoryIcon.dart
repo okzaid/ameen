@@ -18,8 +18,7 @@ class MaterialCategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isPhotoIcon(iconName))
-      return PhotoIcon(iconName: iconName, size: size);
+    if (isPhotoIcon(iconName)) return PhotoIcon(iconName: iconName, size: size);
     return SizedBox(
       width: size,
       height: size,

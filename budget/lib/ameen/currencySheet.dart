@@ -121,8 +121,8 @@ class _CurrencyRow extends StatelessWidget {
             : getColor(context, "lightDarkAccentHeavyLight"),
         onTap: onTap,
         child: Padding(
-          padding:
-              const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 11),
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 14, vertical: 11),
           child: Row(
             children: [
               SizedBox(

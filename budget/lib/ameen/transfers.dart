@@ -142,7 +142,8 @@ class TransferReceivedRow extends StatelessWidget {
       padding: const EdgeInsetsDirectional.only(top: 4, bottom: 8),
       child: Tappable(
         borderRadius: 12,
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        color:
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
         onTap: () => openBottomSheet(
           context,
           fullSnap: true,
@@ -167,8 +168,8 @@ class TransferReceivedRow extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding:
-              const EdgeInsetsDirectional.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 12, vertical: 8),
           child: Row(
             children: [
               Icon(Icons.currency_exchange_rounded,
