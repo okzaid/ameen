@@ -43,7 +43,9 @@ jobs:
             echo "storeFile=upload.jks"
           } > android/key.properties
       - name: Build APKs (one per CPU, smaller downloads)
-        run: flutter build apk --release --split-per-abi
+        # AMEEN: every CI build gets a higher version code than the last (and
+        # than upstream's), so phones and App Tester see it as an update
+        run: flutter build apk --release --split-per-abi --build-number=$((3000000 + ${{ github.run_number }}))
       - uses: actions/upload-artifact@v4
         with:
           name: ameen-apk-${{ github.sha }}
