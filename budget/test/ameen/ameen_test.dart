@@ -734,4 +734,80 @@ void main() {
       expect(daftarTotals(rows), {"aed": 9000 - 50 - 12.5, "inr": -20});
     });
   });
+
+  group("Daftar editing", () {
+    DaftarRow row({String sub = "s1", DaftarType type = DaftarType.expense}) =>
+        DaftarRow(
+          transactionPk: "t1",
+          date: DateTime(2026, 10, 1),
+          title: "Lulu",
+          categoryPk: "food",
+          categoryName: "Food",
+          subcategoryPk: sub,
+          subcategoryName: "Groceries",
+          amount: -50,
+          walletPk: "w1",
+          walletName: "ADCB",
+          currency: "aed",
+          decimals: 2,
+          type: type,
+          paid: true,
+          note: "",
+          place: "",
+          paidIn: "",
+        );
+
+    test("staging a value equal to the original removes the edit", () {
+      DaftarRow r = row();
+      DaftarEdits e = daftarSetCell({}, r, DaftarColumn.title, "Carrefour");
+      expect(e["t1"]![DaftarColumn.title], "Carrefour");
+      expect(daftarEditCount(e), 1);
+      e = daftarSetCell(e, r, DaftarColumn.title, "Lulu");
+      expect(e.isEmpty, true);
+    });
+
+    test("a new category drops a subcategory that doesn't belong", () {
+      DaftarRow r = row();
+      bool belongs(String? sub, String? cat) => sub == null || cat == "food";
+      DaftarEdits e = daftarSetCell({}, r, DaftarColumn.category, "transit",
+          subcategoryBelongs: belongs);
+      expect(e["t1"]![DaftarColumn.category], "transit");
+      expect(e["t1"]!.containsKey(DaftarColumn.subcategory), true);
+      expect(e["t1"]![DaftarColumn.subcategory], null);
+      DaftarEdits back = daftarSetCell(e, r, DaftarColumn.category, "food",
+          subcategoryBelongs: belongs);
+      expect(back["t1"]![DaftarColumn.subcategory], null);
+    });
+
+    test("amounts keep their sign unless one is typed", () {
+      expect(daftarParseAmount("20", -50), -20);
+      expect(daftarParseAmount("1,250.50", 10), 1250.5);
+      expect(daftarParseAmount("+30", -50), 30);
+      expect(daftarParseAmount("-30", 50), -30);
+      expect(daftarParseAmount("AED 12", -1), -12);
+      expect(daftarParseAmount("abc", -1), null);
+    });
+
+    test("what can be edited", () {
+      DaftarRow expense = row();
+      DaftarRow transfer = row(type: DaftarType.transfer);
+      DaftarRow upcoming = row(type: DaftarType.upcoming);
+      expect(daftarCanEdit(expense, DaftarColumn.amount), true);
+      expect(daftarCanEdit(transfer, DaftarColumn.amount), false);
+      expect(daftarCanEdit(transfer, DaftarColumn.title), true);
+      expect(daftarCanEdit(expense, DaftarColumn.paid), false);
+      expect(daftarCanEdit(upcoming, DaftarColumn.paid), true);
+      expect(daftarCanEdit(expense, DaftarColumn.type), false);
+      expect(daftarCanClear(DaftarColumn.subcategory), true);
+      expect(daftarCanClear(DaftarColumn.amount), false);
+    });
+
+    test("copies are independent (undo snapshots)", () {
+      DaftarRow r = row();
+      DaftarEdits a = daftarSetCell({}, r, DaftarColumn.title, "A");
+      DaftarEdits b = daftarSetCell(a, r, DaftarColumn.note, "x");
+      expect(daftarEditCount(a), 1);
+      expect(daftarEditCount(b), 2);
+    });
+  });
 }

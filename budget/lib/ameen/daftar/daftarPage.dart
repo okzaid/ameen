@@ -1,3 +1,6 @@
+import 'package:budget/widgets/openSnackbar.dart';
+import 'package:budget/widgets/globalSnackbar.dart';
+import 'package:budget/ameen/daftar/daftarCellEditors.dart';
 import 'package:budget/widgets/button.dart';
 import 'package:budget/ameen/daftar/daftarDialog.dart';
 import 'dart:async';
@@ -28,6 +31,7 @@ import 'package:provider/provider.dart';
 
 const double daftarMinWidth = 900;
 const double _rowHeight = 38;
+const double _gutter = 32; // the open-transaction button at the row start
 const String _layoutSetting = "ameenDaftarLayout";
 const String _viewsSetting = "ameenDaftarViews";
 
@@ -172,6 +176,20 @@ class _DaftarPageState extends State<DaftarPage> {
   final FocusNode _focus = FocusNode();
   final TextEditingController _searchController = TextEditingController();
 
+  // Editing (phase 2): staged edits with undo/redo, a cell cursor and one
+  // cell edited in place (title, amount)
+  Map<String, DaftarRow> _byPk = {};
+  DaftarColumn _cursorColumn = DaftarColumn.title;
+  DaftarEdits _edits = {};
+  final List<DaftarEdits> _undo = [];
+  final List<DaftarEdits> _redo = [];
+  (String, DaftarColumn)? _inline;
+  final TextEditingController _inlineController = TextEditingController();
+  final FocusNode _inlineFocus = FocusNode();
+  bool _saving = false;
+  // A dialog editor is open; further edits wait until it closes
+  bool _editorOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -190,6 +208,8 @@ class _DaftarPageState extends State<DaftarPage> {
     _horizontal.dispose();
     _focus.dispose();
     _searchController.dispose();
+    _inlineController.dispose();
+    _inlineFocus.dispose();
     super.dispose();
   }
 
@@ -201,6 +221,7 @@ class _DaftarPageState extends State<DaftarPage> {
     _rows = [
       for (Transaction t in _transactions) daftarRowOf(t, _categories, wallets)
     ];
+    _byPk = {for (DaftarRow r in _rows) r.transactionPk: r};
     _loaded = true;
     _applyQuery();
   }
@@ -302,7 +323,19 @@ class _DaftarPageState extends State<DaftarPage> {
 
   // ---- selection and keyboard ----------------------------------------------
 
-  void _tapRow(int index) {
+  AllWallets get _wallets =>
+      _builtWithWallets ?? Provider.of<AllWallets>(context, listen: false);
+
+  // A row as shown: with its staged edits
+  DaftarRow _display(DaftarRow row) =>
+      daftarRowWithEdits(row, _edits[row.transactionPk], _categories, _wallets);
+
+  void _tapCell(int index, DaftarColumn column) {
+    if (_inline != null) {
+      if (_inline!.$1 == _shown[index].transactionPk && _inline!.$2 == column)
+        return;
+      _commitInline();
+    }
     _focus.requestFocus();
     String pk = _shown[index].transactionPk;
     bool add = HardwareKeyboard.instance.isControlPressed ||
@@ -321,6 +354,7 @@ class _DaftarPageState extends State<DaftarPage> {
         _anchor = index;
       }
       _cursor = index;
+      _cursorColumn = column;
     });
   }
 
@@ -338,14 +372,8 @@ class _DaftarPageState extends State<DaftarPage> {
     _focus.requestFocus();
   }
 
-  void _moveCursor(int delta) {
-    if (_shown.isEmpty) return;
-    int index = ((_cursor ?? -1) + delta).clamp(0, _shown.length - 1);
-    setState(() {
-      _cursor = index;
-      _anchor = index;
-      _selected = {_shown[index].transactionPk};
-    });
+  void _scrollToRow(int index) {
+    if (!_vertical.hasClients) return;
     double top = index * _rowHeight;
     double viewport = _vertical.position.viewportDimension;
     if (top < _vertical.offset)
@@ -354,33 +382,378 @@ class _DaftarPageState extends State<DaftarPage> {
       _vertical.jumpTo(top + _rowHeight - viewport);
   }
 
+  void _moveCursor(int delta) {
+    if (_shown.isEmpty) return;
+    int index = ((_cursor ?? -1) + delta).clamp(0, _shown.length - 1);
+    setState(() {
+      _cursor = index;
+      _anchor = index;
+      _selected = {_shown[index].transactionPk};
+    });
+    _scrollToRow(index);
+  }
+
+  void _moveColumn(int delta) {
+    List<DaftarColumn> columns = _columns;
+    int at = columns.indexOf(_cursorColumn);
+    int next = (at == -1 ? 0 : at + delta).clamp(0, columns.length - 1);
+    setState(() => _cursorColumn = columns[next]);
+    // Keep the cursor column in view
+    if (!_horizontal.hasClients) return;
+    double left = 40;
+    for (DaftarColumn c in columns.take(next)) left += _widths[c]!;
+    double right = left + _widths[columns[next]]!;
+    double view = _horizontal.position.viewportDimension;
+    if (left < _horizontal.offset)
+      _horizontal.jumpTo(left - 40);
+    else if (right > _horizontal.offset + view)
+      _horizontal
+          .jumpTo(min(right - view, _horizontal.position.maxScrollExtent));
+  }
+
+  // ---- staged edits ----------------------------------------------------------
+
+  bool _subcategoryBelongs(String? subcategoryPk, String? categoryPk) =>
+      subcategoryPk == null ||
+      _categories[subcategoryPk]?.mainCategoryPk == categoryPk;
+
+  void _stage(DaftarEdits next) {
+    setState(() {
+      _undo.add(_edits);
+      if (_undo.length > 100) _undo.removeAt(0);
+      _redo.clear();
+      _edits = next;
+    });
+  }
+
+  DaftarEdits _withCell(DaftarEdits edits, DaftarRow original,
+          DaftarColumn column, Object? value) =>
+      daftarSetCell(edits, original, column, value,
+          subcategoryBelongs: _subcategoryBelongs);
+
+  void _setCell(DaftarRow original, DaftarColumn column, Object? value) =>
+      _stage(_withCell(_edits, original, column, value));
+
+  void _undoEdit() {
+    if (_undo.isEmpty) return;
+    setState(() {
+      _redo.add(_edits);
+      _edits = _undo.removeLast();
+    });
+  }
+
+  void _redoEdit() {
+    if (_redo.isEmpty) return;
+    setState(() {
+      _undo.add(_edits);
+      _edits = _redo.removeLast();
+    });
+  }
+
+  // Discarding can be undone (Ctrl+Z) until the page is left
+  void _discard() => _stage({});
+
+  Future _save() async {
+    if (_inline != null) _commitInline();
+    if (_edits.isEmpty || _saving) return;
+    setState(() => _saving = true);
+    int transactions = _edits.length;
+    DaftarSaveResult result = await saveDaftarEdits(_edits);
+    if (!mounted) return;
+    setState(() {
+      _saving = false;
+      _edits = {
+        for (String pk in result.failed)
+          if (_edits[pk] != null) pk: _edits[pk]!
+      };
+      _undo.clear();
+      _redo.clear();
+    });
+    openSnackbar(SnackbarMessage(
+      title: result.failed.isEmpty
+          ? "daftar-saved".tr(namedArgs: {"count": result.saved.toString()})
+          : "daftar-save-failed".tr(namedArgs: {
+              "failed": result.failed.length.toString(),
+              "count": transactions.toString(),
+            }),
+      icon: result.failed.isEmpty
+          ? Icons.check_circle_rounded
+          : Icons.warning_rounded,
+    ));
+    _focus.requestFocus();
+  }
+
+  // Edit one cell: in place for title and amount, a dialog for the rest
+  Future _editCell(int index, DaftarColumn column, {String? startWith}) async {
+    DaftarRow original = _shown[index];
+    DaftarRow shown = _display(original);
+    if (!daftarCanEdit(shown, column)) return;
+    if (_editorOpen) return;
+    if (_inline != null) {
+      if (_inline == (original.transactionPk, column)) return;
+      _commitInline();
+    }
+    _editorOpen = true;
+    try {
+      await _editCellNow(original, shown, column, startWith);
+    } finally {
+      _editorOpen = false;
+    }
+  }
+
+  Future _editCellNow(DaftarRow original, DaftarRow shown,
+      DaftarColumn column, String? startWith) async {
+    switch (column) {
+      case DaftarColumn.title:
+        _startInline(original, column, startWith ?? shown.title,
+            startedByTyping: startWith != null);
+        return;
+      case DaftarColumn.amount:
+        _startInline(original, column,
+            startWith ?? _plainAmount(shown.amount.abs(), shown.decimals),
+            startedByTyping: startWith != null);
+        return;
+      case DaftarColumn.date:
+        DateTime? date = await pickDaftarDate(context, shown.date);
+        if (date != null) _setCell(original, column, date);
+        break;
+      case DaftarColumn.category:
+        DaftarChoice<String?>? choice =
+            await pickDaftarCategory(context, _categories, shown.categoryPk);
+        if (choice != null) _setCell(original, column, choice.value);
+        break;
+      case DaftarColumn.subcategory:
+        DaftarChoice<String?>? choice = await pickDaftarSubcategory(
+            context, _categories, shown.categoryPk, shown.subcategoryPk);
+        if (choice != null) _setCell(original, column, choice.value);
+        break;
+      case DaftarColumn.account:
+        DaftarChoice<String>? choice = await pickDaftarAccount(
+            context, _wallets, shown.walletPk, shown.currency);
+        if (choice != null) _setCell(original, column, choice.value);
+        break;
+      case DaftarColumn.paid:
+        _setCell(original, column, !shown.paid);
+        break;
+      case DaftarColumn.note:
+        String? note = await editDaftarNote(context, shown.note);
+        if (note != null) _setCell(original, column, note);
+        break;
+      case DaftarColumn.place:
+        String? place = await editDaftarPlace(context, shown.place);
+        if (place != null) _setCell(original, column, place.trim());
+        break;
+      case DaftarColumn.type:
+      case DaftarColumn.paidIn:
+        return;
+    }
+    _focus.requestFocus();
+  }
+
+  // "6.44" (the account's decimals, no trailing zeros)
+  String _plainAmount(double value, int decimals) {
+    String text = value.toStringAsFixed(decimals);
+    if (text.contains(".")) text = text.replaceAll(RegExp(r"\.?0+$"), "");
+    return text;
+  }
+
+  void _startInline(DaftarRow original, DaftarColumn column, String text,
+      {bool startedByTyping = false}) {
+    // Let go of the grid's focus so the editor's autofocus takes the
+    // keyboard (as a dialog's text field does)
+    _focus.unfocus();
+    setState(() {
+      _inline = (original.transactionPk, column);
+      _inlineController.text = text;
+      // Typing replaces the value; a typed first character keeps going
+      _inlineController.selection = startedByTyping
+          ? TextSelection.collapsed(offset: text.length)
+          : TextSelection(baseOffset: 0, extentOffset: text.length);
+    });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _inlineFocus.requestFocus());
+  }
+
+  // Applies the text being typed; [then] moves the cursor afterwards
+  void _commitInline({void Function()? then}) {
+    (String, DaftarColumn)? editing = _inline;
+    if (editing == null) return;
+    DaftarRow? original = _byPk[editing.$1];
+    String text = _inlineController.text;
+    setState(() => _inline = null);
+    if (original != null) {
+      if (editing.$2 == DaftarColumn.title) {
+        _setCell(original, DaftarColumn.title, text.trim());
+      } else if (editing.$2 == DaftarColumn.amount) {
+        double? amount = daftarParseAmount(text, _display(original).amount);
+        if (amount != null)
+          _setCell(original, DaftarColumn.amount, amount);
+        else
+          openSnackbar(SnackbarMessage(
+              title: "daftar-not-a-number".tr(), icon: Icons.warning_rounded));
+      }
+    }
+    _focus.requestFocus();
+    then?.call();
+  }
+
+  void _cancelInline() {
+    setState(() => _inline = null);
+    _focus.requestFocus();
+  }
+
+  KeyEventResult _onInlineKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _cancelInline();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      bool back = HardwareKeyboard.instance.isShiftPressed;
+      _commitInline(then: () => _moveColumn(back ? -1 : 1));
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  // Ctrl+D: the cursor cell's value into the same column of every selected row
+  void _fillDown() {
+    if (_cursor == null || _selected.length < 2) return;
+    DaftarColumn column = _cursorColumn;
+    Object? value = daftarCellValue(_display(_shown[_cursor!]), column);
+    DaftarEdits next = _edits;
+    for (DaftarRow row in _shown) {
+      if (!_selected.contains(row.transactionPk)) continue;
+      DaftarRow shown = _display(row);
+      if (!daftarCanEdit(shown, column)) continue;
+      // Accounts only within the same currency
+      if (column == DaftarColumn.account &&
+          _wallets.indexedByPk[value]?.currency != shown.currency) continue;
+      // Subcategories only within their category
+      if (column == DaftarColumn.subcategory &&
+          !_subcategoryBelongs(value as String?, shown.categoryPk)) continue;
+      next = _withCell(next, row, column, value);
+    }
+    _stage(next);
+  }
+
+  // Delete: clear the cursor column in the selected rows (or the cursor row)
+  void _clearCells() {
+    DaftarColumn column = _cursorColumn;
+    if (!daftarCanClear(column)) return;
+    DaftarEdits next = _edits;
+    for (DaftarRow row in _shown) {
+      bool target = _selected.isEmpty
+          ? _cursor != null && row == _shown[_cursor!]
+          : _selected.contains(row.transactionPk);
+      if (!target || !daftarCanEdit(_display(row), column)) continue;
+      next = _withCell(next, row, column, daftarClearedValue(column));
+    }
+    _stage(next);
+  }
+
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (_inline != null) return KeyEventResult.ignored;
     if (event is! KeyDownEvent && event is! KeyRepeatEvent)
       return KeyEventResult.ignored;
     bool command = HardwareKeyboard.instance.isControlPressed ||
         HardwareKeyboard.instance.isMetaPressed;
+    bool shift = HardwareKeyboard.instance.isShiftPressed;
     LogicalKeyboardKey key = event.logicalKey;
-    if (command && key == LogicalKeyboardKey.keyA) {
-      setState(() => _selected = {for (DaftarRow r in _shown) r.transactionPk});
+    KeyEventResult done(void Function() action) {
+      action();
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.escape && _selected.isNotEmpty) {
-      setState(() => _selected = {});
-      return KeyEventResult.handled;
+
+    if (command) {
+      if (key == LogicalKeyboardKey.keyA)
+        return done(() => setState(
+            () => _selected = {for (DaftarRow r in _shown) r.transactionPk}));
+      if (key == LogicalKeyboardKey.keyZ)
+        return done(shift ? _redoEdit : _undoEdit);
+      if (key == LogicalKeyboardKey.keyY) return done(_redoEdit);
+      if (key == LogicalKeyboardKey.keyS) return done(_save);
+      if (key == LogicalKeyboardKey.keyD) return done(_fillDown);
+      if (key == LogicalKeyboardKey.enter && _cursor != null)
+        return done(() => _openRow(_cursor!));
+      return KeyEventResult.ignored;
     }
-    if (key == LogicalKeyboardKey.arrowDown) {
-      _moveCursor(1);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowUp) {
-      _moveCursor(-1);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.enter && _cursor != null) {
-      _openRow(_cursor!);
-      return KeyEventResult.handled;
-    }
+    if (key == LogicalKeyboardKey.escape && _selected.isNotEmpty)
+      return done(() => setState(() => _selected = {}));
+    if (key == LogicalKeyboardKey.arrowDown) return done(() => _moveCursor(1));
+    if (key == LogicalKeyboardKey.arrowUp) return done(() => _moveCursor(-1));
+    if (key == LogicalKeyboardKey.arrowRight) return done(() => _moveColumn(1));
+    if (key == LogicalKeyboardKey.arrowLeft) return done(() => _moveColumn(-1));
+    if (key == LogicalKeyboardKey.tab)
+      return done(() => _moveColumn(shift ? -1 : 1));
+    if (_cursor == null) return KeyEventResult.ignored;
+    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.f2)
+      return done(() => _editCell(_cursor!, _cursorColumn));
+    if (key == LogicalKeyboardKey.space && _cursorColumn == DaftarColumn.paid)
+      return done(() => _editCell(_cursor!, _cursorColumn));
+    if (key == LogicalKeyboardKey.delete || key == LogicalKeyboardKey.backspace)
+      return done(_clearCells);
+    // Typing starts editing a title or amount, like a spreadsheet
+    String? character = event.character;
+    if (character != null &&
+        character.length == 1 &&
+        character.trim() != "" &&
+        (_cursorColumn == DaftarColumn.title ||
+            _cursorColumn == DaftarColumn.amount))
+      return done(
+          () => _editCell(_cursor!, _cursorColumn, startWith: character));
     return KeyEventResult.ignored;
+  }
+
+  // Leaving with unsaved changes asks first
+  Future _leave() async {
+    if (_edits.isEmpty) {
+      popRoute(context);
+      return;
+    }
+    bool? discard = await showDaftarDialog<bool>(
+      context,
+      title: "daftar-unsaved".tr(),
+      maxWidth: 440,
+      builder: (dialogContext) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextFont(
+            text: "daftar-unsaved-description".tr(namedArgs: {
+              "count": daftarEditCount(_edits).toString(),
+            }),
+            fontSize: 15,
+            maxLines: 4,
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Button(
+                  label: "daftar-discard-leave".tr(),
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  textColor: Theme.of(context).colorScheme.onTertiaryContainer,
+                  expandedLayout: true,
+                  onTap: () => Navigator.of(dialogContext).pop(true),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Button(
+                  label: "daftar-keep-editing".tr(),
+                  expandedLayout: true,
+                  onTap: () => Navigator.of(dialogContext).pop(false),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (discard == true && mounted) {
+      setState(() => _edits = {});
+      popRoute(context);
+    }
   }
 
   // ---- filters --------------------------------------------------------------
@@ -471,23 +844,79 @@ class _DaftarPageState extends State<DaftarPage> {
         ),
       );
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SafeArea(
-        child: Focus(
-          focusNode: _focus,
-          autofocus: true,
-          onKeyEvent: _onKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _toolbar(context),
-              _filterBar(context),
-              Expanded(child: _grid(context, wallets)),
-              _footer(context, wallets),
-            ],
+    return PopScope(
+      canPop: _edits.isEmpty,
+      onPopInvoked: (didPop) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: SafeArea(
+          child: Focus(
+            focusNode: _focus,
+            autofocus: true,
+            onKeyEvent: _onKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _toolbar(context),
+                _filterBar(context),
+                Expanded(child: _grid(context, wallets)),
+                if (_edits.isNotEmpty) _changesBar(context),
+                _footer(context, wallets),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _changesBar(BuildContext context) {
+    int cells = daftarEditCount(_edits);
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(18, 8, 12, 8),
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      child: Row(
+        children: [
+          Icon(Icons.edit_note_rounded,
+              color: Theme.of(context).colorScheme.onSecondaryContainer),
+          SizedBox(width: 10),
+          TextFont(
+            text: (cells == 1 ? "daftar-change-one" : "daftar-changes-many")
+                    .tr(namedArgs: {"count": cells.toString()}) +
+                " " +
+                (_edits.length == 1
+                        ? "daftar-in-transaction-one"
+                        : "daftar-in-transactions-many")
+                    .tr(namedArgs: {"count": _edits.length.toString()}),
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+          SizedBox(width: 12),
+          IconButton(
+            tooltip: "daftar-undo".tr(),
+            icon: Icon(Icons.undo_rounded),
+            onPressed: _undo.isEmpty ? null : _undoEdit,
+          ),
+          IconButton(
+            tooltip: "daftar-redo".tr(),
+            icon: Icon(Icons.redo_rounded),
+            onPressed: _redo.isEmpty ? null : _redoEdit,
+          ),
+          Spacer(),
+          TextButton(
+            onPressed: _saving ? null : _discard,
+            child: TextFont(text: "daftar-discard".tr(), fontSize: 15),
+          ),
+          SizedBox(width: 8),
+          Button(
+            label: _saving ? "daftar-saving".tr() : "save".tr(),
+            icon: Icons.save_rounded,
+            onTap: _save,
+            disabled: _saving,
+          ),
+        ],
       ),
     );
   }
@@ -499,7 +928,7 @@ class _DaftarPageState extends State<DaftarPage> {
         children: [
           IconButton(
             icon: Icon(Icons.arrow_back_rounded),
-            onPressed: () => popRoute(context),
+            onPressed: _leave,
           ),
           SizedBox(width: 4),
           Icon(Icons.table_chart_rounded,
@@ -583,7 +1012,8 @@ class _DaftarPageState extends State<DaftarPage> {
 
   Widget _grid(BuildContext context, AllWallets wallets) {
     List<DaftarColumn> columns = _columns;
-    double totalWidth = columns.fold(0.0, (sum, c) => sum + _widths[c]!) + 16;
+    double totalWidth =
+        columns.fold(0.0, (sum, c) => sum + _widths[c]!) + 16 + _gutter;
     if (!_loaded) return Center(child: CircularProgressIndicator());
     return Scrollbar(
       controller: _horizontal,
@@ -637,6 +1067,7 @@ class _DaftarPageState extends State<DaftarPage> {
       ),
       child: Row(
         children: [
+          SizedBox(width: _gutter),
           for (DaftarColumn column in columns)
             _HeaderCell(
               width: _widths[column]!,
@@ -664,35 +1095,90 @@ class _DaftarPageState extends State<DaftarPage> {
 
   Widget _row(BuildContext context, AllWallets wallets,
       List<DaftarColumn> columns, int index) {
-    DaftarRow row = _shown[index];
-    bool selected = _selected.contains(row.transactionPk);
+    DaftarRow original = _shown[index];
+    DaftarRow row = _display(original);
+    Map<DaftarColumn, Object?>? edited = _edits[original.transactionPk];
+    bool selected = _selected.contains(original.transactionPk);
     Color? background = selected
         ? Theme.of(context).colorScheme.secondaryContainer
         : index.isOdd
             ? getColor(context, "lightDarkAccent").withOpacity(0.45)
             : null;
-    return Listener(
-      onPointerDown: (_) => _tapRow(index),
-      child: GestureDetector(
-        onDoubleTap: () => _openRow(index),
-        child: Container(
-          color: background,
-          padding: const EdgeInsetsDirectional.only(start: 8),
-          child: Row(
-            children: [
-              for (DaftarColumn column in columns)
-                SizedBox(
-                  width: _widths[column]!,
-                  child: Padding(
-                    padding:
-                        const EdgeInsetsDirectional.symmetric(horizontal: 8),
-                    child: _cell(context, wallets, row, column),
-                  ),
-                ),
-            ],
+    Color editedColor = Colors.amber.withOpacity(0.22);
+    Color cursorColor = Theme.of(context).colorScheme.secondary;
+    return Container(
+      color: background,
+      padding: const EdgeInsetsDirectional.only(start: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: _gutter,
+            child: IconButton(
+              tooltip: "daftar-open".tr(),
+              padding: EdgeInsets.zero,
+              iconSize: 16,
+              icon: Icon(Icons.open_in_new_rounded,
+                  color: getColor(context, "textLight").withOpacity(0.7)),
+              onPressed: () => _openRow(index),
+            ),
           ),
-        ),
+          for (DaftarColumn column in columns)
+            Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: (_) => _tapCell(index, column),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onDoubleTap: () => _editCell(index, column),
+                child: Container(
+                  width: _widths[column]!,
+                  height: _rowHeight,
+                  decoration: BoxDecoration(
+                    color: edited != null && edited.containsKey(column)
+                        ? editedColor
+                        : null,
+                    border: _cursor == index && _cursorColumn == column
+                        ? Border.all(color: cursorColor, width: 1.5)
+                        : null,
+                  ),
+                  padding: const EdgeInsetsDirectional.symmetric(horizontal: 8),
+                  child: _inline?.$1 == original.transactionPk &&
+                          _inline?.$2 == column
+                      ? _inlineEditor(context, column)
+                      : _cell(context, wallets, row, column),
+                ),
+              ),
+            ),
+        ],
       ),
+    );
+  }
+
+  Widget _inlineEditor(BuildContext context, DaftarColumn column) {
+    return Focus(
+      onKeyEvent: _onInlineKey,
+      child: Center(
+          child: TextField(
+        controller: _inlineController,
+        focusNode: _inlineFocus,
+        autofocus: true,
+        textAlign:
+            column == DaftarColumn.amount ? TextAlign.end : TextAlign.start,
+        keyboardType: column == DaftarColumn.amount
+            ? TextInputType.numberWithOptions(decimal: true, signed: true)
+            : TextInputType.text,
+        style: TextStyle(
+          fontSize: 14,
+          color: getColor(context, "black"),
+          fontFamily: appStateSettings["font"],
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        onSubmitted: (_) => _commitInline(then: () => _moveCursor(1)),
+        onTapOutside: (_) => _commitInline(),
+      )),
     );
   }
 
@@ -740,12 +1226,19 @@ class _DaftarPageState extends State<DaftarPage> {
       case DaftarColumn.type:
         return _text(context, daftarTypeLabel(row.type));
       case DaftarColumn.paid:
+        bool editable = daftarCanEdit(row, column);
         return Align(
           alignment: AlignmentDirectional.centerStart,
           child: row.paid
               ? Icon(Icons.check_rounded,
-                  size: 18, color: getColor(context, "textLight"))
-              : SizedBox.shrink(),
+                  size: 18,
+                  color: editable
+                      ? Theme.of(context).colorScheme.secondary
+                      : getColor(context, "textLight"))
+              : editable
+                  ? Icon(Icons.radio_button_unchecked_rounded,
+                      size: 16, color: getColor(context, "textLight"))
+                  : SizedBox.shrink(),
         );
       case DaftarColumn.note:
         return _text(context, row.note.replaceAll("\n", " · "));
@@ -760,9 +1253,10 @@ class _DaftarPageState extends State<DaftarPage> {
       );
 
   Widget _footer(BuildContext context, AllWallets wallets) {
-    Iterable<DaftarRow> counted = _selected.isEmpty
-        ? _shown
-        : _shown.where((r) => _selected.contains(r.transactionPk));
+    Iterable<DaftarRow> counted = (_selected.isEmpty
+            ? _shown
+            : _shown.where((r) => _selected.contains(r.transactionPk)))
+        .map(_display);
     Map<String, double> totals = daftarTotals(counted);
     String totalsText = totals.entries
         .map((e) => convertToMoney(wallets, e.value,

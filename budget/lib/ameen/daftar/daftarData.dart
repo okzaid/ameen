@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:budget/ameen/recentPlaces.dart';
+import 'package:drift/drift.dart' show Value;
+
 import 'package:budget/ameen/daftar/daftarModel.dart';
 import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/locationTagging.dart';
@@ -110,3 +113,124 @@ Stream<(List<Transaction>, Map<String, TransactionCategory>)>
 
 Future<Transaction?> daftarTransaction(String transactionPk) =>
     database.tryGetTransactionFromPk(transactionPk);
+
+// ---- Editing (phase 2) -----------------------------------------------------
+
+// How a row looks with its staged edits applied
+DaftarRow daftarRowWithEdits(
+  DaftarRow row,
+  Map<DaftarColumn, Object?>? edits,
+  Map<String, TransactionCategory> categories,
+  AllWallets wallets,
+) {
+  if (edits == null || edits.isEmpty) return row;
+  T pick<T>(DaftarColumn column, T original) =>
+      edits.containsKey(column) ? edits[column] as T : original;
+  String? categoryPk = pick<String?>(DaftarColumn.category, row.categoryPk);
+  String? subcategoryPk =
+      pick<String?>(DaftarColumn.subcategory, row.subcategoryPk);
+  String walletPk = pick<String>(DaftarColumn.account, row.walletPk);
+  TransactionWallet? wallet = wallets.indexedByPk[walletPk];
+  double amount = pick<double>(DaftarColumn.amount, row.amount);
+  DaftarType type = row.type;
+  if (edits.containsKey(DaftarColumn.amount) &&
+      (type == DaftarType.expense || type == DaftarType.income))
+    type = amount > 0 ? DaftarType.income : DaftarType.expense;
+  return DaftarRow(
+    transactionPk: row.transactionPk,
+    date: pick<DateTime>(DaftarColumn.date, row.date),
+    title: pick<String>(DaftarColumn.title, row.title),
+    categoryPk: categoryPk,
+    categoryName: categories[categoryPk]?.name ?? row.categoryName,
+    subcategoryPk: subcategoryPk,
+    subcategoryName:
+        subcategoryPk == null ? "" : categories[subcategoryPk]?.name ?? "",
+    amount: amount,
+    walletPk: walletPk,
+    walletName: wallet?.name ?? row.walletName,
+    currency: wallet?.currency ?? row.currency,
+    decimals: wallet?.decimals ?? row.decimals,
+    type: type,
+    paid: pick<bool>(DaftarColumn.paid, row.paid),
+    note: pick<String>(DaftarColumn.note, row.note),
+    place: pick<String>(DaftarColumn.place, row.place),
+    paidIn: row.paidIn,
+  );
+}
+
+class DaftarSaveResult {
+  DaftarSaveResult(this.saved, this.failed);
+  final int saved;
+  final List<String> failed; // transactionPks that could not be saved
+}
+
+// Writes staged edits through Cashew's own save (which also marks the
+// transaction modified, so Drive sync carries it). Hidden note tags (place,
+// paid-in, rates) are kept; a renamed place keeps its coordinates.
+Future<DaftarSaveResult> saveDaftarEdits(DaftarEdits edits) async {
+  int saved = 0;
+  List<String> failed = [];
+  for (MapEntry<String, Map<DaftarColumn, Object?>> entry in edits.entries) {
+    Map<DaftarColumn, Object?> columns = entry.value;
+    try {
+      Transaction? original = await database.tryGetTransactionFromPk(entry.key);
+      if (original == null) {
+        failed.add(entry.key);
+        continue;
+      }
+      Transaction updated = original;
+      if (columns.containsKey(DaftarColumn.date))
+        updated = updated.copyWith(
+            dateCreated: columns[DaftarColumn.date] as DateTime);
+      if (columns.containsKey(DaftarColumn.title))
+        updated = updated.copyWith(name: columns[DaftarColumn.title] as String);
+      if (columns.containsKey(DaftarColumn.category))
+        updated = updated.copyWith(
+            categoryFk: columns[DaftarColumn.category] as String);
+      if (columns.containsKey(DaftarColumn.subcategory))
+        updated = updated.copyWith(
+            subCategoryFk: Value(columns[DaftarColumn.subcategory] as String?));
+      if (columns.containsKey(DaftarColumn.amount)) {
+        double amount = columns[DaftarColumn.amount] as double;
+        updated = updated.copyWith(amount: amount, income: amount > 0);
+      }
+      if (columns.containsKey(DaftarColumn.account))
+        updated =
+            updated.copyWith(walletFk: columns[DaftarColumn.account] as String);
+      if (columns.containsKey(DaftarColumn.paid))
+        updated = updated.copyWith(paid: columns[DaftarColumn.paid] as bool);
+      if (columns.containsKey(DaftarColumn.note) ||
+          columns.containsKey(DaftarColumn.place)) {
+        Map<String, String> tags = ameenTagsOf(original.note);
+        String note = columns.containsKey(DaftarColumn.note)
+            ? columns[DaftarColumn.note] as String
+            : noteWithoutAmeenTags(original.note);
+        if (columns.containsKey(DaftarColumn.place)) {
+          String place = (columns[DaftarColumn.place] as String).trim();
+          TransactionLocation? location =
+              TransactionLocation.fromPayload(tags[locationTag]);
+          if (place == "" && !(location?.hasCoordinates ?? false)) {
+            tags.remove(locationTag);
+          } else if (place == "") {
+            tags[locationTag] = TransactionLocation(
+                    location!.latitude, location.longitude, null)
+                .toPayload();
+          } else {
+            tags[locationTag] = TransactionLocation(
+                    location?.latitude, location?.longitude, place)
+                .toPayload();
+            await rememberRecentPlace(place);
+          }
+        }
+        updated = updated.copyWith(note: noteWithAmeenTags(note, tags));
+      }
+      await database.createOrUpdateTransaction(updated,
+          originalTransaction: original);
+      saved++;
+    } catch (e) {
+      print("Daftar could not save " + entry.key + ": " + e.toString());
+      failed.add(entry.key);
+    }
+  }
+  return DaftarSaveResult(saved, failed);
+}

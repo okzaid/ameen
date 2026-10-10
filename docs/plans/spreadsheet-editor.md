@@ -100,6 +100,10 @@ entries, not only import cleanup; must stay fast at any size.
 1. Read-only grid: columns, virtual scrolling, sort, filters, search, saved
    views, selection totals. — done (editors open as dialogs on desktop)
 2. Editing: cell edits, staged save/discard, keyboard, fill-down, undo.
+   — done (title/amount in place, other cells in a dialog; Enter/F2/typing
+   edits, Delete clears, Ctrl+D fills down, Ctrl+Z/Y, Ctrl+S saves; leaving
+   with unsaved changes asks first; transfers' category/amount/account and
+   type/paid-in stay read-only until phase 3)
 3. Bulk edits with preview + undo; transfer/foreign-currency rules.
 4. Cleanup helpers: duplicates, similar titles, uncategorised suggestions.
 Later: .mmbak (Money Manager by Realbyte) importer, then clean up with this.

@@ -98,6 +98,22 @@
     "daftar-from": "From",
     "daftar-to": "To",
     "daftar-yes": "Yes",
-    "daftar-no": "No"
+    "daftar-no": "No",
+    "daftar-saved": "Saved {count} transactions",
+    "daftar-save-failed": "{failed} of {count} transactions couldn't be saved. They're still marked as changed.",
+    "daftar-not-a-number": "That isn't a number",
+    "daftar-unsaved": "Unsaved changes",
+    "daftar-unsaved-description": "You have {count} unsaved changes. Leaving discards them.",
+    "daftar-discard-leave": "Discard and leave",
+    "daftar-keep-editing": "Keep editing",
+    "daftar-undo": "Undo (Ctrl+Z)",
+    "daftar-redo": "Redo (Ctrl+Y)",
+    "daftar-discard": "Discard",
+    "daftar-saving": "Saving…",
+    "daftar-open": "Open transaction (Ctrl+Enter)",
+    "daftar-change-one": "1 change",
+    "daftar-changes-many": "{count} changes",
+    "daftar-in-transaction-one": "in 1 transaction",
+    "daftar-in-transactions-many": "in {count} transactions"
   }
 }

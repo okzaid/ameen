@@ -413,3 +413,134 @@ Map<String, double> daftarTotals(Iterable<DaftarRow> rows) {
   }
   return totals;
 }
+
+// ---- Editing (phase 2) -----------------------------------------------------
+// Staged edits: transactionPk → column → new value. A key that is present
+// with a null value means "set to none" (e.g. no subcategory).
+// Values: date DateTime · title String · category String (pk) ·
+// subcategory String? (pk) · amount double (signed) · account String (pk) ·
+// paid bool · note String · place String ("" = remove the place).
+typedef DaftarEdits = Map<String, Map<DaftarColumn, Object?>>;
+
+DaftarEdits copyDaftarEdits(DaftarEdits edits) => {
+      for (MapEntry<String, Map<DaftarColumn, Object?>> e in edits.entries)
+        e.key: Map.of(e.value)
+    };
+
+int daftarEditCount(DaftarEdits edits) =>
+    edits.values.fold(0, (sum, columns) => sum + columns.length);
+
+// Which cells can be edited in the grid. Transfers keep their amount, account
+// and category (their paired transaction must change too); the type and the
+// paid-in original are changed elsewhere.
+bool daftarCanEdit(DaftarRow row, DaftarColumn column) {
+  switch (column) {
+    case DaftarColumn.date:
+    case DaftarColumn.title:
+    case DaftarColumn.note:
+    case DaftarColumn.place:
+      return true;
+    case DaftarColumn.category:
+    case DaftarColumn.subcategory:
+    case DaftarColumn.amount:
+    case DaftarColumn.account:
+      return row.type != DaftarType.transfer;
+    case DaftarColumn.paid:
+      return const [
+        DaftarType.upcoming,
+        DaftarType.subscription,
+        DaftarType.repetitive,
+        DaftarType.lent,
+        DaftarType.borrowed,
+      ].contains(row.type);
+    case DaftarColumn.type:
+    case DaftarColumn.paidIn:
+      return false;
+  }
+}
+
+// Columns Delete can clear, and the value they clear to
+bool daftarCanClear(DaftarColumn column) => const [
+      DaftarColumn.title,
+      DaftarColumn.note,
+      DaftarColumn.place,
+      DaftarColumn.subcategory,
+    ].contains(column);
+
+Object? daftarClearedValue(DaftarColumn column) =>
+    column == DaftarColumn.subcategory ? null : "";
+
+// "1,250.50", "-20", "+300" → signed amount. Without a sign the current sign
+// is kept (an expense stays an expense). Null when it isn't a number.
+double? daftarParseAmount(String input, double current) {
+  String text = input.trim().replaceAll(RegExp(r"[^0-9.+\-]"), "");
+  if (text == "") return null;
+  bool explicitMinus = text.startsWith("-");
+  bool explicitPlus = text.startsWith("+");
+  double? value = double.tryParse(text.replaceAll(RegExp(r"^[+\-]"), ""));
+  if (value == null) return null;
+  if (explicitMinus) return -value;
+  if (explicitPlus) return value;
+  return current > 0 ? value : -value;
+}
+
+// The value a cell holds, in the same form as an edit (used for fill-down)
+Object? daftarCellValue(DaftarRow row, DaftarColumn column) {
+  switch (column) {
+    case DaftarColumn.date:
+      return row.date;
+    case DaftarColumn.title:
+      return row.title;
+    case DaftarColumn.category:
+      return row.categoryPk;
+    case DaftarColumn.subcategory:
+      return row.subcategoryPk;
+    case DaftarColumn.amount:
+      return row.amount;
+    case DaftarColumn.account:
+      return row.walletPk;
+    case DaftarColumn.paid:
+      return row.paid;
+    case DaftarColumn.note:
+      return row.note;
+    case DaftarColumn.place:
+      return row.place;
+    case DaftarColumn.type:
+    case DaftarColumn.paidIn:
+      return null;
+  }
+}
+
+// Stage [value] for one cell. Setting a value equal to the original removes
+// the edit. Changing the category drops a subcategory that doesn't belong to
+// it ([subcategoryBelongs] answers that).
+DaftarEdits daftarSetCell(
+  DaftarEdits edits,
+  DaftarRow original,
+  DaftarColumn column,
+  Object? value, {
+  bool Function(String? subcategoryPk, String? categoryPk)? subcategoryBelongs,
+}) {
+  DaftarEdits next = copyDaftarEdits(edits);
+  Map<DaftarColumn, Object?> columns = next[original.transactionPk] ?? {};
+  if (value == daftarCellValue(original, column))
+    columns.remove(column);
+  else
+    columns[column] = value;
+  if (column == DaftarColumn.category && subcategoryBelongs != null) {
+    String? sub = columns.containsKey(DaftarColumn.subcategory)
+        ? columns[DaftarColumn.subcategory] as String?
+        : original.subcategoryPk;
+    if (sub != null && !subcategoryBelongs(sub, value as String?)) {
+      if (original.subcategoryPk == null)
+        columns.remove(DaftarColumn.subcategory);
+      else
+        columns[DaftarColumn.subcategory] = null;
+    }
+  }
+  if (columns.isEmpty)
+    next.remove(original.transactionPk);
+  else
+    next[original.transactionPk] = columns;
+  return next;
+}
