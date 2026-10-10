@@ -1,3 +1,4 @@
+import 'package:budget/ameen/daftar/daftarPage.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:budget/database/tables.dart';
@@ -284,6 +285,9 @@ Future executeAppLink(BuildContext? context, Uri uri,
 
   // Note these URIs must be unique from the launch from widget URIs!
   switch (endPoint) {
+    case "daftar": // AMEEN: app.ameen.zaidshaikh.com/daftar
+      if (context != null) openDaftar(context);
+      break;
     case "addTransaction":
       if (context != null) {
         if (params["messageToParse"] != null &&

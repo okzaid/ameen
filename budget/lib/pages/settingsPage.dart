@@ -1,3 +1,4 @@
+import 'package:budget/ameen/daftar/daftarPage.dart';
 import 'package:budget/ameen/accountChoice.dart';
 import 'package:budget/ameen/foreignAmount.dart';
 import 'package:budget/ameen/baseCurrency.dart';
@@ -181,6 +182,7 @@ class MorePages extends StatelessWidget {
                 ),
               ],
             ),
+          DaftarMoreEntry(), // AMEEN: wide screens only
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -1,3 +1,4 @@
+import 'package:budget/ameen/daftar/daftarModel.dart';
 import 'package:budget/ameen/recentPlaces.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget/struct/databaseGlobal.dart';
@@ -634,6 +635,103 @@ void main() {
       Map<String, dynamic> merged = mergeRecentPlaces(local, remote);
       expect(merged["dubai"]["n"], "DUBAI");
       expect(merged["sharjah"]["n"], "Sharjah");
+    });
+  });
+
+  group("Daftar", () {
+    DaftarRow r(String pk, DateTime date, String title, double amount,
+            {String category = "food",
+            String? sub,
+            String wallet = "w1",
+            String? currency = "aed",
+            DaftarType type = DaftarType.expense,
+            bool paid = true,
+            String note = "",
+            String place = ""}) =>
+        DaftarRow(
+          transactionPk: pk,
+          date: date,
+          title: title,
+          categoryPk: category,
+          categoryName: category.toUpperCase(),
+          subcategoryPk: sub,
+          subcategoryName: sub ?? "",
+          amount: amount,
+          walletPk: wallet,
+          walletName: wallet,
+          currency: currency,
+          decimals: 2,
+          type: type,
+          paid: paid,
+          note: note,
+          place: place,
+          paidIn: "",
+        );
+    List<DaftarRow> rows = [
+      r("1", DateTime(2026, 10, 1, 9), "Lulu", -50, place: "Dubai"),
+      r("2", DateTime(2026, 10, 2), "Salary", 9000,
+          category: "pay", type: DaftarType.income),
+      r("3", DateTime(2026, 9, 30), "Taxi", -20,
+          category: "transit", note: "airport run", currency: "inr", wallet: "w2"),
+      r("4", DateTime(2026, 10, 2, 18), "Lulu Express", -12.5,
+          sub: "groceries", paid: false),
+    ];
+    List<String> pks(List<DaftarRow> list) =>
+        [for (DaftarRow x in list) x.transactionPk];
+
+    test("default sort is newest first", () {
+      expect(pks(DaftarQuery().apply(rows)), ["4", "2", "1", "3"]);
+    });
+
+    test("search looks in title, note and place", () {
+      expect(pks(DaftarQuery(search: "lulu").apply(rows)), ["4", "1"]);
+      expect(pks(DaftarQuery(search: "AIRPORT").apply(rows)), ["3"]);
+      expect(pks(DaftarQuery(search: "dubai").apply(rows)), ["1"]);
+    });
+
+    test("filters of every kind", () {
+      List<String> run(DaftarFilter f) =>
+          pks(DaftarQuery(filters: [f]).apply(rows));
+      expect(run(DaftarTextFilter(DaftarColumn.title, DaftarTextMode.startsWith, "lulu")), ["4", "1"]);
+      expect(run(DaftarTextFilter(DaftarColumn.note, DaftarTextMode.isEmpty, "")), ["4", "2", "1"]);
+      expect(run(DaftarSetFilter(DaftarColumn.category, {"transit", "pay"})), ["2", "3"]);
+      expect(run(DaftarSetFilter(DaftarColumn.subcategory, {null})), ["2", "1", "3"]);
+      expect(run(DaftarRangeFilter(DaftarColumn.amount, max: -15)), ["1", "3"]);
+      expect(run(DaftarDateFilter(DaftarColumn.date, start: DateTime(2026, 10, 2), end: DateTime(2026, 10, 2))), ["4", "2"]);
+      expect(run(DaftarBoolFilter(DaftarColumn.paid, false)), ["4"]);
+    });
+
+    test("click sorts by one column, shift-click adds a second", () {
+      DaftarQuery q = DaftarQuery().withSortBy(DaftarColumn.title);
+      expect(pks(q.apply(rows)), ["1", "4", "2", "3"]);
+      q = q.withSortBy(DaftarColumn.title);
+      expect(q.sorts.single.ascending, false);
+      DaftarQuery multi = DaftarQuery()
+          .withSortBy(DaftarColumn.category)
+          .withSortBy(DaftarColumn.amount, addToExisting: true);
+      expect(multi.sorts.length, 2);
+      expect(pks(multi.apply(rows)), ["1", "4", "2", "3"]);
+    });
+
+    test("saved views round trip", () {
+      DaftarQuery q = DaftarQuery(
+        filters: [
+          DaftarSetFilter(DaftarColumn.category, {"food"}),
+          DaftarRangeFilter(DaftarColumn.amount, min: -100),
+          DaftarDateFilter(DaftarColumn.date, start: DateTime(2026, 10, 1)),
+          DaftarTextFilter(DaftarColumn.title, DaftarTextMode.contains, "lu"),
+          DaftarBoolFilter(DaftarColumn.paid, true),
+        ],
+        sorts: [DaftarSort(DaftarColumn.amount)],
+        search: "x",
+      );
+      DaftarQuery back = DaftarQuery.fromJson(q.toJson());
+      expect(back.toJson().toString(), q.toJson().toString());
+      expect(pks(back.copyWith(search: "").apply(rows)), ["1"]);
+    });
+
+    test("totals are kept per currency", () {
+      expect(daftarTotals(rows), {"aed": 9000 - 50 - 12.5, "inr": -20});
     });
   });
 }

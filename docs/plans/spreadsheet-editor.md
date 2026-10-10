@@ -1,9 +1,9 @@
-# Ameen: recent places + spreadsheet editor
+# Ameen: recent places + Daftar (spreadsheet editor)
 
-Status: proposed (2026-10-10). Order: 1 Recent places → 2 Spreadsheet
+Status: 1 done; 2 proposed (2026-10-10). Order: 1 Recent places → 2 Daftar
 (built and tested on Cashew's Preview Demo data) → .mmbak import later.
 
-## 1. Recent places (small)
+## 1. Recent places (small) — done
 
 - "Type a place" and "Rename place" show recent places as chips under the
   input; typing filters them (contains, case-insensitive); tap to fill.
@@ -13,7 +13,12 @@ Status: proposed (2026-10-10). Order: 1 Recent places → 2 Spreadsheet
   title → account links).
 - Cost: ~1 hook line; the rest in `lib/ameen/locationTagging.dart`.
 
-## 2. Spreadsheet editor
+## 2. Daftar (spreadsheet editor)
+
+Name: **Daftar** (the merchant's ledger book in Arabic, Urdu and Persian).
+Link: **https://app.ameen.zaidshaikh.com/daftar**. It must live on the web
+app's own address: the browser keeps the app's data per address, so another
+address (e.g. a subdomain) would start empty.
 
 A page inside the Ameen app (web at app.ameen.zaidshaikh.com; any wide
 screen). Edits the same database as everything else, so links to budgets,
@@ -21,9 +26,13 @@ goals, transfers and objectives stay intact and changes reach the phone
 through Google Drive sync. General-purpose: for ongoing editing of all
 entries, not only import cleanup; must stay fast at any size.
 
-### Entry point
-- "Spreadsheet" in the More page and the wide-screen sidebar, shown when the
+### Entry points
+- Link: /daftar is handled where the web app already reads link paths at
+  start (Cashew's app links, e.g. /addTransaction); before onboarding the
+  welcome screen shows first.
+- "Daftar" in the More page and the wide-screen sidebar, shown when the
   window is ≥ 900 px wide (a phone gets a short "open on a wider screen" note).
+- Optional "Open Daftar" link on ameen.zaidshaikh.com next to "Open app".
 
 ### Grid
 - One row per transaction. Columns: Date & time · Title · Category ›
@@ -89,15 +98,16 @@ entries, not only import cleanup; must stay fast at any size.
 
 ### Build phases (each one shippable, demo data first)
 1. Read-only grid: columns, virtual scrolling, sort, filters, search, saved
-   views, selection totals.
+   views, selection totals. — done (editors open as dialogs on desktop)
 2. Editing: cell edits, staged save/discard, keyboard, fill-down, undo.
 3. Bulk edits with preview + undo; transfer/foreign-currency rules.
 4. Cleanup helpers: duplicates, similar titles, uncategorised suggestions.
 Later: .mmbak (Money Manager by Realbyte) importer, then clean up with this.
 
 ### Upstream / merge cost
-- New code in `lib/ameen/spreadsheet/`. Hooks: the More page entry and the
-  wide-screen sidebar entry (~2–3 lines), plus a route.
+- New code in `lib/ameen/daftar/`; one data file (`daftarData.dart`) is the
+  only part that talks to Cashew's database. Hooks: the More page entry, the
+  wide-screen sidebar entry and the /daftar link (~3–4 lines).
 - Grid built from Flutter's own two-dimensional scrolling (no new package) to
   keep `pubspec.yaml` identical to upstream, unless performance testing shows
   a package is needed (would add one line).
