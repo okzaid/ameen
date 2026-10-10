@@ -46,21 +46,22 @@ class DefaultFirebaseOptions {
     }
   }
 
+  // AMEEN: Ameen's Firebase project (ameen-zaidshaikh)
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBGiaRl72d4k3Ki0dh8ra-gU4v2z04CgIw',
-    appId: '1:267621253497:web:12558fe9abebf7fa842fa8',
-    messagingSenderId: '267621253497',
-    projectId: 'budget-app-flutter',
-    authDomain: 'budget-app-flutter.firebaseapp.com',
-    storageBucket: 'budget-app-flutter.appspot.com',
+    apiKey: 'AIzaSyD8GbrE-j2F7Fu8YIo8CZo3JCrQJ6Ptaf4',
+    appId: '1:574981835110:web:3e886498f6fa65704d60a7',
+    messagingSenderId: '574981835110',
+    projectId: 'ameen-zaidshaikh',
+    authDomain: 'ameen-zaidshaikh.firebaseapp.com',
+    storageBucket: 'ameen-zaidshaikh.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDNVDtwGJUHBZohwB2RDeUco-5hAGfx2bA',
-    appId: '1:267621253497:android:e7a2967eaf8dd072842fa8',
-    messagingSenderId: '267621253497',
-    projectId: 'budget-app-flutter',
-    storageBucket: 'budget-app-flutter.appspot.com',
+    apiKey: 'AIzaSyAOogUJw5Z1wt9QG_9HWWKZHSO5zK0xmog',
+    appId: '1:574981835110:android:6ab14e7cf967bb6d4d60a7',
+    messagingSenderId: '574981835110',
+    projectId: 'ameen-zaidshaikh',
+    storageBucket: 'ameen-zaidshaikh.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

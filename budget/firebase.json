@@ -2,7 +2,7 @@
   "hosting": {
     "public": "build/web",
     "predeploy": "flutter build web --release --web-renderer canvaskit --no-tree-shake-icons",
-    "site":"budget-track",
+    "site": "ameen-zaidshaikh",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -14,5 +14,13 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Ameen",
+        "supportEmail": "zaidcae@gmail.com"
+      }
+    }
   }
 }
