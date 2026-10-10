@@ -103,3 +103,4 @@ The Material icon catalog is generated: edit `scripts/gen_icon_catalog.py` and r
 | No primary account | `lib/pages/settingsPage.dart` | `DefaultAccountSetting` (Cashew's primary account, used only where nothing can be asked) |
 | Accounts shortcut | `lib/widgets/bottomNavBar.dart` | "Accounts" (`accountDetails`) added to the bottom bar shortcut picker, gear opens `WalletsSettings` |
 | Firebase | `android/app/google-services.json`, `lib/firebase_options.dart` (web, android), `web/index.html`, `firebase.json`, `.firebaserc` | Ameen's own Firebase project `ameen-zaidshaikh` instead of Cashew's (iOS config not switched yet) |
+| Hosting | `.github/workflows/site-pages.yml` | marketing site `/site` on GitHub Pages at ameen.zaidshaikh.com (DNS: CNAME `ameen` → okzaid.github.io); web app on Firebase Hosting at app.ameen.zaidshaikh.com |
