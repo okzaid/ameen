@@ -22,33 +22,38 @@ import 'package:geolocator/geolocator.dart';
 // Only the city is ever shown.
 //
 //   "<note><U+2063>⌖25.204849,55.270782|Dubai"
+//   "<note><U+2063>⌖|Dubai"                     (typed, no GPS)
 
 const String locationTaggingSetting = "ameenLocationTagging";
 final RegExp _locationPayload =
-    RegExp(r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:\|(.*))?$");
+    RegExp(r"^(?:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?))?(?:\|(.*))?$");
 
 class TransactionLocation {
   const TransactionLocation(this.latitude, this.longitude, this.city);
-  final double latitude;
-  final double longitude;
+  // Null for a place typed by hand
+  final double? latitude;
+  final double? longitude;
   final String? city;
+
+  bool get hasCoordinates => latitude != null && longitude != null;
 
   // Payload of the location tag (see noteTags.dart)
   String toPayload() =>
-      latitude.toStringAsFixed(6) +
-      "," +
-      longitude.toStringAsFixed(6) +
+      (hasCoordinates
+          ? latitude!.toStringAsFixed(6) + "," + longitude!.toStringAsFixed(6)
+          : "") +
       (city == null || city == "" ? "" : "|" + city!.replaceAll("|", " "));
 
   static TransactionLocation? fromPayload(String? payload) {
     if (payload == null) return null;
     RegExpMatch? match = _locationPayload.firstMatch(payload.trim());
     if (match == null) return null;
-    double? lat = double.tryParse(match.group(1)!);
-    double? lng = double.tryParse(match.group(2)!);
-    if (lat == null || lng == null) return null;
-    String? city = match.group(3);
-    return TransactionLocation(lat, lng, city == "" ? null : city);
+    double? lat = double.tryParse(match.group(1) ?? "");
+    double? lng = double.tryParse(match.group(2) ?? "");
+    String? city = match.group(3)?.trim();
+    if (city == "") city = null;
+    if ((lat == null || lng == null) && city == null) return null;
+    return TransactionLocation(lat, lng, city);
   }
 }
 
@@ -130,7 +135,7 @@ Future _setLatest(Position position) async {
   String? city = _latest?.city;
   // Only look the city up again after moving a few hundred metres
   if (_latest == null ||
-      Geolocator.distanceBetween(_latest!.latitude, _latest!.longitude,
+      Geolocator.distanceBetween(_latest!.latitude!, _latest!.longitude!,
               position.latitude, position.longitude) >
           300) city = await _cityOf(position.latitude, position.longitude);
   _latest = TransactionLocation(position.latitude, position.longitude, city);
@@ -227,9 +232,11 @@ class LocationTaggingSetting extends StatelessWidget {
 
 String _placeName(TransactionLocation location) =>
     location.city ??
-    location.latitude.toStringAsFixed(4) +
-        ", " +
-        location.longitude.toStringAsFixed(4);
+    (location.hasCoordinates
+        ? location.latitude!.toStringAsFixed(4) +
+            ", " +
+            location.longitude!.toStringAsFixed(4)
+        : "");
 
 class TransactionLocationRow extends StatefulWidget {
   const TransactionLocationRow({
@@ -290,13 +297,14 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
     setLocation(found);
   }
 
-  // The name shown for the place; the saved coordinates stay as they are
-  void renamePlace(TransactionLocation location) {
-    String name = location.city ?? "";
+  // The name shown for the place; saved coordinates (if any) stay as they are.
+  // With no location yet, this types a place by hand.
+  void renamePlace(TransactionLocation? location) {
+    String name = location?.city ?? "";
     openBottomSheet(
       context,
       PopupFramework(
-        title: "rename-place".tr(),
+        title: (location == null ? "type-a-place" : "rename-place").tr(),
         child: SelectText(
           labelText: "place-name".tr(),
           selectedText: name,
@@ -306,15 +314,21 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
           buttonLabel: "set-name".tr(),
           next: () {
             String trimmed = name.trim();
-            setLocation(TransactionLocation(location.latitude,
-                location.longitude, trimmed == "" ? null : trimmed));
+            TransactionLocation updated = TransactionLocation(
+                location?.latitude,
+                location?.longitude,
+                trimmed == "" ? null : trimmed);
+            // No name and no coordinates: nothing left to keep
+            if (updated.hasCoordinates || updated.city != null)
+              setLocation(updated);
+            else if (location != null) setLocation(null);
           },
         ),
       ),
     );
   }
 
-  void openActions(TransactionLocation location) {
+  void openActions(TransactionLocation? location) {
     bool outlined = appStateSettings["outlinedIcons"] == true;
     Widget action(String label, IconData iconData, VoidCallback onTap) =>
         Padding(
@@ -336,19 +350,23 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
     openBottomSheet(
       context,
       PopupFramework(
-        title: _placeName(location),
+        title: location == null ? "add-location".tr() : _placeName(location),
         child: Column(
           children: [
+            if (location != null)
+              action(
+                "open-in-maps".tr(),
+                outlined ? Icons.map_outlined : Icons.map_rounded,
+                () => openUrl(
+                    "https://www.google.com/maps/search/?api=1&query=" +
+                        (location.hasCoordinates
+                            ? location.latitude!.toStringAsFixed(6) +
+                                "," +
+                                location.longitude!.toStringAsFixed(6)
+                            : Uri.encodeComponent(location.city ?? ""))),
+              ),
             action(
-              "open-in-maps".tr(),
-              outlined ? Icons.map_outlined : Icons.map_rounded,
-              () => openUrl("https://www.google.com/maps/search/?api=1&query=" +
-                  location.latitude.toStringAsFixed(6) +
-                  "," +
-                  location.longitude.toStringAsFixed(6)),
-            ),
-            action(
-              "rename-place".tr(),
+              (location == null ? "type-a-place" : "rename-place").tr(),
               outlined ? Icons.edit_outlined : Icons.edit_rounded,
               () => renamePlace(location),
             ),
@@ -357,13 +375,14 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
               outlined ? Icons.my_location_outlined : Icons.my_location_rounded,
               useCurrentLocation,
             ),
-            action(
-              "remove-location".tr(),
-              outlined
-                  ? Icons.location_off_outlined
-                  : Icons.location_off_rounded,
-              () => setLocation(null),
-            ),
+            if (location != null)
+              action(
+                "remove-location".tr(),
+                outlined
+                    ? Icons.location_off_outlined
+                    : Icons.location_off_rounded,
+                () => setLocation(null),
+              ),
           ],
         ),
       ),
@@ -399,10 +418,9 @@ class _TransactionLocationRowState extends State<TransactionLocationRow> {
               : (outlined ? Icons.add_outlined : Icons.add_rounded),
           onTap: () {
             if (locating) return;
-            if (location != null)
-              openActions(location);
-            else
-              useCurrentLocation();
+            // With a location: its actions; without: current location or
+            // type a place
+            openActions(location);
           },
         ),
       ),

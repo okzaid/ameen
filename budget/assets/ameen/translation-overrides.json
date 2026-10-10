@@ -70,6 +70,7 @@
     "location-unavailable": "Couldn't get your location",
     "made-by": "Made by",
     "rename-place": "Rename place",
-    "place-name": "Place name"
+    "place-name": "Place name",
+    "type-a-place": "Type a place"
   }
 }

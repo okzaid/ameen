@@ -200,6 +200,16 @@ void main() {
       expect(visibleNote(note), "");
       expect(hasVisibleNote(note), false);
     });
+    test("a typed place is kept without coordinates", () {
+      String note = noteWithLocation("Coffee", TransactionLocation(null, null, "Old Town"));
+      TransactionLocation? parsed = locationOfNote(note);
+      expect(parsed!.city, "Old Town");
+      expect(parsed.hasCoordinates, false);
+      expect(ameenTagsOf(note)[locationTag], "|Old Town");
+      expect(visibleNote(note), "Coffee");
+      expect(TransactionLocation.fromPayload("|"), null);
+      expect(TransactionLocation.fromPayload(""), null);
+    });
     test("re-saving replaces the tag instead of adding another", () {
       String once = noteWithLocation("Taxi", dubai);
       String twice = noteWithLocation(once, dubai);
